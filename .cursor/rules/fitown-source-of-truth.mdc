@@ -1,0 +1,37 @@
+---
+description: FitOwn planning docs index, skills, and mandatory read order for all agent work in this repo
+alwaysApply: true
+---
+
+# FitOwn — Source of Truth
+
+This repo is **FitOwn (MASGARTI Fit Tech)** POC v0.1. Follow project docs before acting.
+
+## Mandatory read order
+
+1. @docs/planning/README.md — planning index (start here)
+2. Matching module plan: @docs/planning/plans/ — one file per feature area
+3. Scope: @docs/planning/PRODUCT.md
+4. Stack: @docs/planning/TECH_STACK.md (pnpm, Expo, Supabase)
+5. Phases: @docs/planning/IMPLEMENTATION_ROADMAP.md
+
+Root agent guide: @AGENTS.md
+
+## Project skills (.cursor/skills/)
+
+| Skill | When |
+|-------|------|
+| `fitown-project` | Product context, POC boundaries |
+| `fitown-mobile-standards` | Code in apps/mobile or packages |
+| `fitown-figma-mobile` | Figma → React Native UI |
+| `fitown-supabase-migrations` | SQL migrations, schema, `pnpm db:migrate` — **not** user-supabase MCP |
+
+For Figma MCP: load `figma-use` before `use_figma`.
+
+## Hard constraints
+
+- **pnpm only** — not npm or yarn
+- **POC scope only** — defer wearables, AI, CV, blockchain (PRODUCT.md §4.2)
+- **Plans before code** — read the module plan file before implementing its features
+- **Data ownership** — client owns data; trainer view is read-only
+- **Figma icons** — MCP exports are often SVG saved as `.png`; they render blank with `expo-image`. Use `react-native-svg` in `components/icons/`. Verify with `file <path>`. See @.cursor/skills/fitown-figma-mobile/references/asset-export.md

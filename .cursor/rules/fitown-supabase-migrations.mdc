@@ -1,0 +1,20 @@
+---
+description: FitOwn Supabase migrations — use migration-kit, never wrong MCP project
+globs:
+  - supabase/**
+  - packages/types/**
+  - scripts/apply-migrations.sh
+---
+
+# FitOwn database migrations
+
+Before editing SQL or schema-related types:
+
+1. Load skill **`fitown-supabase-migrations`**
+2. Project ref must be **`spcnvkgzzmtdzehrarnp`** only
+3. **Do not** use Cursor `user-supabase` MCP for DDL (wrong project risk)
+4. Use `pnpm db:status` and `pnpm db:migrate` from `supabase/migration-kit/`
+5. New files: `pnpm db:migrate:new fitown_<name>`
+6. Update `packages/types` when `profiles` or domain tables change
+
+Tracking: `fitown.schema_migrations` + `supabase/migration-kit/manifest.json`

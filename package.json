@@ -1,0 +1,24 @@
+{
+  "name": "fit-studio",
+  "private": true,
+  "scripts": {
+    "start": "./dev.sh",
+    "dev": "./dev.sh",
+    "dev:mobile": "./dev.sh",
+    "dev:backend": "pnpm --filter @fitown/backend dev",
+    "dev:local": "./dev.sh --local",
+    "ios": "./dev.sh --ios",
+    "android": "./dev.sh --android",
+    "web": "./dev.sh --web",
+    "typecheck": "pnpm -r typecheck",
+    "db:status": "./supabase/migration-kit/scripts/status.sh",
+    "db:migrate": "./supabase/migration-kit/scripts/apply.sh",
+    "db:migrate:new": "./supabase/migration-kit/scripts/new-migration.sh",
+    "db:migrate:bootstrap": "./supabase/migration-kit/scripts/bootstrap-applied.sh",
+    "db:migrate:sync-manifest": "./supabase/migration-kit/scripts/sync-manifest.sh",
+    "db:types": "supabase gen types typescript --project-id spcnvkgzzmtdzehrarnp > apps/mobile/lib/database.types.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

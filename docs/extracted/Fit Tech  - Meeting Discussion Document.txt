@@ -1,0 +1,255 @@
+--- Page 1 ---
+Meeting Discussion Document
+Product Discovery & Strategy Session
+Date: June 22 2026
+Participants: John Bower (Fitness Domain Expert / Personal Trainer), Ahamed (Technology &
+Product Lead)
+Location: Hong Kong
+Duration: Approximately 60 minutes | 9.45 AM HKT
+Document Status: Draft — For Internal Use Only
+1. Meeting Purpose
+The meeting served as an initial product discovery and design thinking session for a proposed
+fitness and health data management application. The objective was to articulate the problem
+space, identify market gaps, define the core value proposition, and establish a starting point for
+prototype development.
+2. Problem Statement
+The central problem identified is that every individual must make daily decisions about what to
+do to improve and maintain their body. Currently, this problem is solved through three channels:
+self-study, group classes, or individual coaching. None of these channels is well-served by
+existing technology in a way that centres the individual's needs and ownership of their own data.
+The discussion identified a "tree of problems," all of which stem from this fundamental daily
+decision-making challenge. The complexity increases as the individual ages, engages multiple
+professionals, travels, changes programs, or encounters injuries and medical constraints.
+3. Market Gap Analysis
+3.1 Existing App Categories
+The market was characterised as fragmented across several categories, none of which
+adequately serves the individual:
+Self-tracking apps allow individuals to log their own activities but provide no mechanism for
+professional review, coaching input, or decision-support. They do not enable the user to
+delegate oversight to a trainer or to receive programming suggestions.
+Business management apps (for gym owners and trainers) focus on membership, scheduling,
+sign-ups, and client data management. Their primary design intent is for the business owner to
+control and own the client's data, making them unsatisfying for the end user despite offering
+useful scheduling functions.
+Trainer-owned coaching apps allow a trainer to create sub-accounts for clients and schedule
+programming. However, these lock the client into a single trainer relationship. The client cannot
+
+--- Page 2 ---
+use the app for independent activities, and the app does not integrate with other tracking tools
+the client may use.
+Generalized training plan platforms (e-books, YouTube programs, spreadsheets) are popular
+but unsupervised, generic, and not tailored to the individual. There is no mechanism to load
+these into a personal plan, compare them against current programming, or adapt them to
+individual constraints.
+Wearable ecosystems (Garmin, Apple Health, Google Health, WHOOP/Hume Band)
+consolidate physiological tracking data but do not address programming, coaching
+communication, or multi-professional coordination.
+3.2 Specific Competitor Reference Points
+Renaissance Periodization (RP Hypertrophy App): The only app identified that makes a
+rudimentary attempt to monitor recovery and fatigue and to adjust programming in real time.
+Recognised as innovative but improvable.
+Garmin: Provides a movement database with manual entry, inertial rep-counting, and rep
+timing. However, it does not calculate or surface 1RM data, does not provide progression
+analysis over time, and does not facilitate coach-client communication.
+Strava: Noted as an interesting case study in the dichotomy between device-based tracking
+and social/community features. Flagged for future detailed exploration.
+MyFitnessPal: Cited as an exemplary model for database-driven data capture in nutrition — the
+user simply types a food item and the nutritional profile is pre-loaded. An analogous database
+will be required for movements and muscle activation mapping.
+Property developer gym app (unnamed): A local Hong Kong example where a property
+developer created an app for trainers to book gym space and for clients to pay trainers. Again,
+this model controls the client rather than serving them.
+3.3 Key Gaps Identified
+No existing app was found that makes it easy to extract 1RM (one-rep maximum) from current
+performance data. No app adequately models progressive overload by surfacing historical
+maximums with temporal context (when the previous max was achieved). No app coordinates
+data sharing across multiple professionals serving the same client. No app gives the individual
+ownership and portability of their complete fitness and health data.
+4. Core Value Proposition
+4.1 The Single-Sentence Summary
+"Who owns the data?"
+The central pain point, distilled to its simplest form, is that the individual whose body is being
+trained does not currently own their own fitness and health data. Trainers keep logs that clients
+cannot access. Each professional the client engages starts from zero. The client cannot
+describe their history because they lack both the data and the professional vocabulary.
+
+--- Page 3 ---
+4.2 The Vision
+The product envisions a client-owned data platform where the individual maintains a
+comprehensive record of their physical training, health constraints, and performance history.
+This data can then be selectively shared with a team of professionals — fitness coaches, sports
+coaches, physiotherapists, dieticians, and medical practitioners — through role-based access
+control.
+The analogy offered was that of a "Health ID" — similar in concept to a Hong Kong ID card but
+for one's physical health and fitness data. The individual carries this identity across all
+professional relationships, eliminating duplication, data loss, and the friction of switching
+between providers.
+5. Key Training Variables Identified
+5.1 Muscular Development (Strength Training)
+The elemental data points required for capturing strength training activity are: weight (load),
+repetitions (reps), sets, and RPE/RIR (Rate of Perceived Exertion / Reps in Reserve). These
+four variables form the minimum viable data capture for any strength-based session.
+5.2 Cardiovascular Training
+The equivalent data points for cardio-based activity are: intensity, duration, and sets (intervals).
+5.3 Two Critical Derived Variables
+Current strength per movement (1RM): The one-rep maximum for each exercise movement,
+derived from performance data (e.g., using established calculators that extrapolate from 2RM or
+5RM). This is the foundation of all programming decisions — determining how much load to
+prescribe requires knowing the client's current maximum. The fact that no app makes this
+extraction easy represents a significant opportunity.
+Current state of recovery and fatigue: As individuals age, recovery becomes increasingly
+important. The ability to model fatigue accumulation and recovery status — and to adjust
+programming accordingly to avoid overtraining — represents both a major pain point and
+innovation opportunity. Overtraining is described as a "global problem" that is largely
+unaddressed by current technology. The statistic was cited that 50% of recreational runners
+have a running injury at any given time, illustrating the scale of the overtraining problem.
+6. Architectural Principles
+6.1 Foundation on Known Physiology
+The architecture must be founded on physiological systems that have been understood for
+hundreds of years and have existed for millions: muscular systems, energy systems,
+cardiovascular systems, and respiratory systems. These are universal across all life and will
+remain relevant indefinitely. Any future decision-making about human self-care will necessarily
+depend on high-quality data regarding muscular activation, cardiovascular activation, current
+capability, and recent history.
+
+--- Page 4 ---
+6.2 Flexibility for Emerging Areas
+The health and fitness landscape is characterised as emerging and not fully defined.
+Approaching it as a solved problem is described as "a recipe for failure." The architecture must
+therefore layer flexibility and uncertainty on top of the stable physiological foundation,
+anticipating that future layers (nutrition science, AI coaching, DNA-based personalisation,
+advanced wearable integration) will require data structures not yet fully specified.
+6.3 Garbage In, Garbage Out
+The competitive advantage lies in anticipating the records that future planning and coaching
+systems (whether human, AI, or hybrid) will rely upon. High-quality, structured data capture
+today creates the foundation for all future intelligence layers. The system is conceived as "a
+series of inputs and outputs" that collects high-quality data about a person's current health and
+fitness status, which can then be reviewed by a personal trainer, an LLM, or a multidisciplinary
+team.
+6.4 Required Databases
+Movement Library: A comprehensive catalogue of exercise movements (e.g., bench press,
+T-bar row, French press, dislocation). This is analogous to MyFitnessPal's food database.
+Muscle Activation Mapping: A separate library mapping which muscles are affected by each
+movement and to what degree (e.g., back squat activates quads, hamstrings, and core; calf
+raise activates calves). This database may exist in open-source form or may need to be created.
+7. Stakeholder Ecosystem
+The product must ultimately serve a multidisciplinary care team centred around the individual
+client. Stakeholders identified include: fitness/strength coaches, sports coaches (running, tennis,
+etc.), dieticians/nutritionists, physiotherapists, medical doctors (including specialists such as
+cardiologists), and massage therapists. Each stakeholder requires different views of the client's
+data, and activities performed with one (e.g., a massage, a physio session) affect the
+programming decisions of others.
+The PARQ (Physical Activity Readiness Questionnaire) was identified as the starting data
+capture instrument — the client intake form that initiates the professional relationship. The core
+problem is encapsulated in the fact that this form is filled in for one trainer and then must be
+repeated from scratch for every subsequent professional.
+8. Competitive Moat & Strategic Positioning
+8.1 Technical Moat
+The system's defensibility lies not in technology (which has a low barrier to entry) but in domain
+expertise — deep understanding of trainer and client needs that technology companies lack.
+The Garmin case study illustrates this principle: despite Apple's unlimited budget, Garmin
+maintains a 25-year lead in running and cycling because they truly understand user needs.
+Similarly, this product requires a trainer embedded in the development process, not just
+technologists.
+
+--- Page 5 ---
+8.2 Why Big Tech Won't Build This (Yet)
+Large technology companies are focused on hardware (watches, bands) and broad-market data
+consolidation. The problem of coaching, programming, and multi-professional coordination is
+not attractive to them because it requires deep domain insight and the market appears small
+relative to hardware markets. Eventually they will address it, but the window of opportunity
+exists now to establish domain expertise and data quality standards.
+8.3 Long-Term Vision
+The product is compared to Facebook (built on relationships) and Google (built on data search)
+— it addresses a fundamental dimension of human existence (physical self-care) and, if
+captured well, creates defensible competitive advantages through data quality, domain
+expertise, and network effects between clients and professionals.
+9. Target User Profile
+Primary demographic: Adults aged 30–45+ years, with the core need intensifying from age 45
+onward. This is driven by physiology — the body begins to deteriorate and requires structured
+maintenance through resistance training. Below age 30, individuals typically work out for
+competitive or aesthetic goals rather than health maintenance.
+Pilot users: High-net-worth individuals who already engage personal trainers, are
+data-conscious, and would value data ownership. One existing client was described who
+already manually tracks his own data using a Garmin watch during lifting sessions and
+photographs the trainer's handwritten log after each session — solving the problem manually
+with duplication and poor usability.
+Personality trait (cross-age): Data-oriented individuals with personal fitness goals. While the
+age demographic skews older for health-driven adoption, younger users who are detail-oriented
+and goal-driven may also adopt.
+10. Design Decisions & Scope for Prototype
+10.1 What to Build First
+A data capturing application that connects the individual client with their fitness trainer. The
+minimum viable product focuses on: structured data entry for training sessions (strength and
+cardio variables), client ownership of that data, and the ability to share data with a coach.
+10.2 What to Defer
+The following were explicitly identified as future layers, not prototype functions: computer vision
+/ AI rep-counting (others with large budgets are solving this), video upload and asynchronous
+coaching review, DNA-based personalisation (no current scientific basis for translation to
+programming), health tracking and medical checkups (the relationship is inverse — fitness
+solves health, not vice versa), wearable device integration, blockchain/Web3 for data security,
+LLM/AI-driven recommendations, and nutrition tracking.
+
+--- Page 6 ---
+10.3 Data Capture Approach
+The first pass uses manual entry only. Computer vision and device integration are deferred but
+architecturally anticipated. The rationale: anything that works with computer vision will also work
+with manual entry, so the data model and ownership layer should be built first.
+10.4 Privacy and Access Control
+Role-based access control is required from the outset in architectural thinking, even if not fully
+implemented in the prototype. Different professionals need different views: the doctor sees
+medical constraints, the running coach sees cardio data, the strength coach sees lifting data,
+family members may see general wellness indicators.
+11. Persona for Testing
+John Bower will serve as the primary test persona (self-role-playing as a client). This provides
+authentic domain expertise and ensures the product meets the needs of someone who will
+actually use it — with the explicit acknowledgment that "if I get pissed off, I'm not going to use
+it." The prototype must be satisfying enough for a knowledgeable trainer to use for tracking their
+own data.
+12. Additional Context Discussed
+Theory of Constraints applied to training: The philosophy that training should identify and
+optimise the individual's critical path (their limiting factor). When you optimise the constraint, you
+optimise the system. This applies to individuals with specific limitations (e.g., Ahamed's
+intermittent breathing condition requiring an inhaler), where standard programs cannot be
+followed and all programming must account for individual physical constraints.
+Fitness solves health (not the reverse): Age-related conditions (pre-diabetes, osteoporosis,
+cardiovascular disease, menopause symptoms) are emergent phenomena of physical
+degeneration. Properly structured resistance and cardiovascular training mitigates
+degeneration. Grip strength and thigh diameter are cited as single-measure predictors of
+lifespan — proxies for overall muscular and cardiovascular health. The tide of adoption favours
+this product: as populations age and health problems increase, the demand for structured
+fitness solutions grows.
+
+--- Page 7 ---
+13. Action Items & Next Steps
+# Action Owner Status
+1 Share client intake form (PARQ) via WhatsApp — electronic version John Pending
+2 Share sample workout log data (Anthony's session) for data model John Pending
+reference
+3 Research and validate market claims — scrutinise John's assertions Ahamed Pending
+about gaps
+4 Digest meeting content, deep-dive thinking on architecture and starting Ahamed Pending
+point
+5 Schedule follow-up session for next week Both Pending
+6 Explore movement library and muscle activation mapping (open-source Ahamed Pending
+availability)
+14. Key Quotes for Reference
+● "The central pain point of this is who owns the data. If you want to understand this and
+summarise it in a single sentence, it's who owns the data." — John Bower
+● "All entrepreneurialism is ultimately around organising a disorganised market." — John
+Bower
+● "The pain point is rooted in human physiology. So there is no amount of AI which is ever
+going to take away the pain points." — John Bower
+● "Garbage in, garbage out. The opportunity here is to start to create a system which
+collects high-quality data about a person's current health and fitness status." — John
+Bower
+● "If we crack this nutshell, that's huge money behind this... It's like Facebook was built on
+relationships, Google was built on data search. It's a fundamental dimension of human
+existence." — Ahamed
+15. Recording Notes
+This document was synthesised from audio transcriptions captured on two devices (Lenovo
+laptop and iPhone) during the same session. Minor transcription discrepancies between devices
+were reconciled by cross-referencing both sources. The recording was stopped before the final
+portion of the conversation regarding the sample workout data (Anthony's session with
+movements: French press, bench press, T-bar row).
+Document prepared for internal product development reference. Not for external distribution.

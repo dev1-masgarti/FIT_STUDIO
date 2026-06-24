@@ -1,0 +1,1715 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitOwn — Lo-Fi Wireframe v0.1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #111;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 40px 0 20px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #111;
+        }
+        .flow-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+        .screen-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+        .screen-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .screen-label {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .screen-number {
+            font-size: 9px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        .phone {
+            width: 280px;
+            height: 520px;
+            border: 3px solid #111;
+            border-radius: 24px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .phone-notch {
+            width: 100px;
+            height: 20px;
+            background: #111;
+            border-radius: 0 0 12px 12px;
+            margin: 0 auto;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .phone-content {
+            flex: 1;
+            padding: 32px 16px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+        .nav-bar {
+            height: 44px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 8px;
+            background: #fafafa;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid #555;
+            border-radius: 4px;
+        }
+        .nav-icon.circle {
+            border-radius: 50%;
+        }
+        .nav-icon.active {
+            background: #111;
+        }
+        .nav-text {
+            font-size: 7px;
+            color: #555;
+        }
+        .w-input {
+            width: 100%;
+            height: 36px;
+            border: 1.5px solid #999;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: #888;
+        }
+        .w-input.large {
+            height: 44px;
+            font-size: 12px;
+        }
+        .w-btn {
+            width: 100%;
+            height: 40px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .w-btn.outline {
+            background: #fff;
+            color: #111;
+            border: 1.5px solid #111;
+        }
+        .w-btn.small {
+            height: 32px;
+            font-size: 10px;
+        }
+        .w-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .w-subtitle {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        .w-text {
+            font-size: 11px;
+            color: #444;
+            margin-bottom: 8px;
+        }
+        .w-card {
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        .w-card.highlight {
+            border-color: #111;
+            background: #f9f9f9;
+        }
+        .w-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .w-col {
+            flex: 1;
+        }
+        .w-divider {
+            height: 1px;
+            background: #ddd;
+            margin: 10px 0;
+        }
+        .w-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .w-back {
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .w-header-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .w-header-action {
+            font-size: 10px;
+            color: #666;
+        }
+        .w-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border: 1px solid #999;
+            border-radius: 10px;
+            font-size: 9px;
+            color: #666;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        .w-badge.active {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+        .w-progress {
+            width: 100%;
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .w-progress-fill {
+            height: 100%;
+            background: #111;
+            border-radius: 3px;
+        }
+        .w-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .w-fab {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+        }
+        .w-toggle {
+            width: 36px;
+            height: 20px;
+            border: 1.5px solid #999;
+            border-radius: 10px;
+            position: relative;
+        }
+        .w-toggle-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #999;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+        .w-toggle.on {
+            border-color: #111;
+            background: #111;
+        }
+        .w-toggle.on .w-toggle-dot {
+            background: #fff;
+            left: auto;
+            right: 2px;
+        }
+        .w-slider-track {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            position: relative;
+            margin: 12px 0;
+        }
+        .w-slider-fill {
+            height: 100%;
+            background: #111;
+            border-radius: 3px;
+            width: 60%;
+        }
+        .w-slider-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #111;
+            position: absolute;
+            top: -5px;
+            left: 58%;
+        }
+        .w-metric {
+            text-align: center;
+            padding: 8px;
+        }
+        .w-metric-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .w-metric-label {
+            font-size: 8px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .w-list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+        .w-list-icon {
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid #999;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .w-list-content {
+            flex: 1;
+        }
+        .w-list-title {
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .w-list-sub {
+            font-size: 9px;
+            color: #666;
+        }
+        .w-list-right {
+            font-size: 10px;
+            color: #999;
+        }
+        .annotation {
+            font-size: 9px;
+            color: #999;
+            border-left: 2px solid #ccc;
+            padding-left: 8px;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #999;
+            padding: 0 8px;
+        }
+        .screen-note {
+            font-size: 9px;
+            color: #666;
+            max-width: 280px;
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        @media (max-width: 768px) {
+            .screen-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+                padding: 12px 0;
+            }
+        }
+        .page-break {
+            margin: 60px 0;
+            border-top: 1px dashed #ccc;
+            position: relative;
+        }
+        .page-break::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f5f5f5;
+            padding: 0 12px;
+            font-size: 9px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>FitOwn — Lo-Fi Wireframe</h1>
+    <p class="subtitle">POC v0.1 | Black &amp; White | Mobile-First | Client-Owned Data</p>
+
+    <!-- FLOW 1: ONBOARDING -->
+    <div class="section-title">Flow 1: Onboarding &amp; Authentication</div>
+    <p class="flow-label">Goal: Get user to first workout log in under 60 seconds</p>
+
+    <div class="screen-grid">
+        <!-- Screen 1: Splash -->
+        <div class="screen-wrapper">
+            <div class="screen-number">1.1</div>
+            <div class="screen-label">Splash</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content" style="justify-content: center; align-items: center;">
+                    <div style="text-align: center;">
+                        <div style="width: 64px; height: 64px; border: 3px solid #111; border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold;">F</div>
+                        <div class="w-title">FitOwn</div>
+                        <div style="font-size: 10px; color: #666; margin-bottom: 40px;">Your body. Your data.</div>
+                        <div class="w-btn">Get Started</div>
+                        <div style="font-size: 10px; color: #666; text-align: center;">Already have an account? <span style="text-decoration: underline;">Log in</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note">Minimal splash. Single CTA. Tagline reinforces data ownership.</div>
+        </div>
+
+        <!-- Screen 2: Sign Up -->
+        <div class="screen-wrapper">
+            <div class="screen-number">1.2</div>
+            <div class="screen-label">Sign Up</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-title">Create Account</div>
+                    <div class="w-subtitle">Your data stays yours. Always.</div>
+                    <div class="w-input">Full Name</div>
+                    <div class="w-input">Email</div>
+                    <div class="w-input">Password ••••••••</div>
+                    <div class="w-row">
+                        <div class="w-col">
+                            <div class="w-input" style="font-size: 10px;">Age</div>
+                        </div>
+                        <div class="w-col">
+                            <div class="w-input" style="font-size: 10px;">Gender ▾</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px;"></div>
+                    <div class="w-btn">Create My Account</div>
+                    <div class="w-divider"></div>
+                    <div class="w-btn outline">Continue with Google</div>
+                    <div class="annotation">Minimal fields. No phone verification in POC. Age/Gender for 1RM calculations.</div>
+                </div>
+            </div>
+            <div class="screen-note">Only essential fields. No friction. Google SSO for speed.</div>
+        </div>
+
+        <!-- Screen 3: Quick Profile -->
+        <div class="screen-wrapper">
+            <div class="screen-number">1.3</div>
+            <div class="screen-label">Quick Profile</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-title">About You</div>
+                    <div class="w-subtitle">Help us personalise your experience</div>
+                    <div class="w-progress"><div class="w-progress-fill" style="width: 33%;"></div></div>
+                    <div class="w-text" style="font-weight: bold; margin-bottom: 4px;">What's your focus?</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;">
+                        <span class="w-badge active">Strength</span>
+                        <span class="w-badge">Cardio</span>
+                        <span class="w-badge">General Health</span>
+                        <span class="w-badge">Sports</span>
+                        <span class="w-badge">Rehab</span>
+                    </div>
+                    <div class="w-text" style="font-weight: bold; margin-bottom: 4px;">Training experience</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;">
+                        <span class="w-badge">Beginner</span>
+                        <span class="w-badge active">Intermediate</span>
+                        <span class="w-badge">Advanced</span>
+                    </div>
+                    <div class="w-text" style="font-weight: bold; margin-bottom: 4px;">Body weight</div>
+                    <div class="w-input">80 kg</div>
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn">Continue</div>
+                    <div style="font-size: 9px; color: #999; text-align: center;">Skip for now →</div>
+                </div>
+            </div>
+            <div class="screen-note">Skippable. Chips for quick selection. Body weight needed for relative strength.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Core Experience"></div>
+
+    <!-- FLOW 2: DASHBOARD -->
+    <div class="section-title">Flow 2: Dashboard — Home Screen</div>
+    <p class="flow-label">Goal: Immediate context — what did I do recently, what should I do next?</p>
+
+    <div class="screen-grid">
+        <!-- Screen 4: Dashboard -->
+        <div class="screen-wrapper">
+            <div class="screen-number">2.1</div>
+            <div class="screen-label">Dashboard</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                        <div>
+                            <div style="font-size: 10px; color: #666;">Good morning</div>
+                            <div style="font-size: 16px; font-weight: bold;">Jack</div>
+                        </div>
+                        <div class="w-avatar">J</div>
+                    </div>
+
+                    <div class="w-card highlight">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 9px; color: #666;">LAST WORKOUT</div>
+                                <div style="font-size: 12px; font-weight: bold;">Upper Body — Strength</div>
+                                <div style="font-size: 9px; color: #666;">2 days ago</div>
+                            </div>
+                            <div style="font-size: 9px; color: #999;">→</div>
+                        </div>
+                    </div>
+
+                    <div class="w-row">
+                        <div class="w-col">
+                            <div class="w-card">
+                                <div class="w-metric">
+                                    <div class="w-metric-value">12</div>
+                                    <div class="w-metric-label">Workouts This Month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-col">
+                            <div class="w-card">
+                                <div class="w-metric">
+                                    <div class="w-metric-value">3</div>
+                                    <div class="w-metric-label">Day Streak</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 11px; font-weight: bold; margin: 8px 0;">Recent Exercises</div>
+                    <div class="w-list-item">
+                        <div class="w-list-icon">◼</div>
+                        <div class="w-list-content">
+                            <div class="w-list-title">Bench Press</div>
+                            <div class="w-list-sub">Est. 1RM: 85kg ↑</div>
+                        </div>
+                        <div class="w-list-right">Jun 20</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-icon">◼</div>
+                        <div class="w-list-content">
+                            <div class="w-list-title">Back Squat</div>
+                            <div class="w-list-sub">Est. 1RM: 110kg —</div>
+                        </div>
+                        <div class="w-list-right">Jun 18</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-icon">○</div>
+                        <div class="w-list-content">
+                            <div class="w-list-title">Running</div>
+                            <div class="w-list-sub">5km / 28min</div>
+                        </div>
+                        <div class="w-list-right">Jun 19</div>
+                    </div>
+                </div>
+                <div class="w-fab">+</div>
+                <div class="nav-bar">
+                    <div class="nav-item"><div class="nav-icon active"></div><span class="nav-text">Home</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Log</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">History</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Share</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Profile</span></div>
+                </div>
+            </div>
+            <div class="screen-note">1RM shown inline. FAB for quick log. Last workout prominent. Zero-scroll-to-value.</div>
+        </div>
+
+        <!-- Screen 5: Dashboard Empty State -->
+        <div class="screen-wrapper">
+            <div class="screen-number">2.2</div>
+            <div class="screen-label">Dashboard (Empty)</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                        <div>
+                            <div style="font-size: 10px; color: #666;">Welcome</div>
+                            <div style="font-size: 16px; font-weight: bold;">Jack</div>
+                        </div>
+                        <div class="w-avatar">J</div>
+                    </div>
+
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                        <div style="width: 60px; height: 60px; border: 2px dashed #ccc; border-radius: 50%; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #ccc;">↑</div>
+                        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">Log Your First Workout</div>
+                        <div style="font-size: 10px; color: #666; margin-bottom: 20px; padding: 0 20px;">Track what you do. Own your data. Share it on your terms.</div>
+                        <div class="w-btn" style="width: 200px;">+ Log Workout</div>
+                    </div>
+
+                    <div class="w-card" style="margin-top: auto;">
+                        <div style="font-size: 9px; color: #666;">NEXT STEP</div>
+                        <div style="font-size: 11px; font-weight: bold;">Complete your health form (PARQ)</div>
+                        <div class="w-progress" style="margin-top: 6px;"><div class="w-progress-fill" style="width: 0%;"></div></div>
+                    </div>
+                </div>
+                <div class="nav-bar">
+                    <div class="nav-item"><div class="nav-icon active"></div><span class="nav-text">Home</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Log</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">History</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Share</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Profile</span></div>
+                </div>
+            </div>
+            <div class="screen-note">First-time user. Single clear action. PARQ prompted but not blocking.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Primary Action"></div>
+
+    <!-- FLOW 3: WORKOUT LOGGING -->
+    <div class="section-title">Flow 3: Log Workout — Primary Action</div>
+    <p class="flow-label">Goal: Capture weight, reps, sets, RPE in under 10 seconds per set</p>
+
+    <div class="screen-grid">
+        <!-- Screen 6: Workout Type -->
+        <div class="screen-wrapper">
+            <div class="screen-number">3.1</div>
+            <div class="screen-label">Select Type</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">✕</span>
+                        <span class="w-header-title">New Workout</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div class="w-title" style="font-size: 14px;">What are you doing today?</div>
+                    <div class="w-subtitle">Select workout type</div>
+
+                    <div class="w-card" style="cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                        <div class="w-list-icon" style="font-size: 16px;">◼</div>
+                        <div>
+                            <div style="font-size: 12px; font-weight: bold;">Strength Training</div>
+                            <div style="font-size: 9px; color: #666;">Weights, machines, bodyweight</div>
+                        </div>
+                    </div>
+
+                    <div class="w-card" style="cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                        <div class="w-list-icon" style="font-size: 16px;">○</div>
+                        <div>
+                            <div style="font-size: 12px; font-weight: bold;">Cardio</div>
+                            <div style="font-size: 9px; color: #666;">Running, cycling, swimming</div>
+                        </div>
+                    </div>
+
+                    <div class="w-card" style="cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                        <div class="w-list-icon" style="font-size: 16px;">◐</div>
+                        <div>
+                            <div style="font-size: 12px; font-weight: bold;">Mixed Session</div>
+                            <div style="font-size: 9px; color: #666;">Strength + cardio combined</div>
+                        </div>
+                    </div>
+
+                    <div class="w-divider"></div>
+                    <div style="font-size: 10px; color: #666;">Today: Sunday, 22 June 2026</div>
+                </div>
+                <div class="nav-bar">
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Home</span></div>
+                    <div class="nav-item"><div class="nav-icon active"></div><span class="nav-text">Log</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">History</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Share</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Profile</span></div>
+                </div>
+            </div>
+            <div class="screen-note">One tap to type. Large targets for all ages. Clear icons.</div>
+        </div>
+
+        <!-- Screen 7: Exercise Selection -->
+        <div class="screen-wrapper">
+            <div class="screen-number">3.2</div>
+            <div class="screen-label">Select Exercise</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Add Exercise</span>
+                        <span class="w-header-action">Done</span>
+                    </div>
+
+                    <div class="w-input large" style="margin-bottom: 12px;">🔍  Search exercises...</div>
+
+                    <div style="font-size: 9px; color: #666; margin-bottom: 6px;">RECENT</div>
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Bench Press</div>
+                            <div class="w-list-sub">Chest, Triceps, Shoulders</div>
+                        </div>
+                        <div class="w-list-right">Last: 80kg</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Back Squat</div>
+                            <div class="w-list-sub">Quads, Hamstrings, Core</div>
+                        </div>
+                        <div class="w-list-right">Last: 100kg</div>
+                    </div>
+
+                    <div style="font-size: 9px; color: #666; margin: 10px 0 6px;">CATEGORIES</div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Chest</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Back</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Legs</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Shoulders</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+
+                    <div class="annotation">Shows last weight for quick reference. Muscle groups visible. Search + browse.</div>
+                </div>
+            </div>
+            <div class="screen-note">Previous max shown in list. Reduces cognitive load for trainer and client.</div>
+        </div>
+
+        <!-- Screen 8: Log Sets -->
+        <div class="screen-wrapper">
+            <div class="screen-number">3.3</div>
+            <div class="screen-label">Log Sets (Strength)</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Bench Press</span>
+                        <span class="w-header-action">💡 History</span>
+                    </div>
+
+                    <div class="w-card" style="background: #f9f9f9;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="font-size: 9px; color: #666;">EST. 1RM</div>
+                            <div style="font-size: 9px; color: #666;">PREVIOUS BEST</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="font-size: 16px; font-weight: bold;">85 kg</div>
+                            <div style="font-size: 16px; font-weight: bold;">80kg × 5</div>
+                        </div>
+                        <div style="font-size: 8px; color: #999;">Last performed: 4 days ago</div>
+                    </div>
+
+                    <div style="font-size: 9px; font-weight: bold; margin: 12px 0 6px; display: flex; justify-content: space-between;">
+                        <span>SET</span><span>KG</span><span>REPS</span><span>RPE</span><span></span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; padding: 6px; background: #f5f5f5; border-radius: 6px;">
+                        <div style="width: 20px; font-size: 11px; font-weight: bold; text-align: center;">1</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">60</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">10</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">7</div>
+                        <div style="font-size: 10px; color: #4a4;">✓</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; padding: 6px; background: #f5f5f5; border-radius: 6px;">
+                        <div style="width: 20px; font-size: 11px; font-weight: bold; text-align: center;">2</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">70</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">8</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">8</div>
+                        <div style="font-size: 10px; color: #4a4;">✓</div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; padding: 6px; border: 1.5px dashed #ccc; border-radius: 6px;">
+                        <div style="width: 20px; font-size: 11px; font-weight: bold; text-align: center;">3</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">75</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">_</div>
+                        <div class="w-input" style="margin: 0; height: 30px; flex: 1; font-size: 12px; justify-content: center;">_</div>
+                        <div style="font-size: 10px; color: #ccc;">○</div>
+                    </div>
+
+                    <div class="w-btn outline small" style="width: 120px; margin: 8px auto;">+ Add Set</div>
+
+                    <div style="font-size: 9px; color: #666; margin-top: 8px;">RPE: 1 (easy) → 10 (max effort)</div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-input" style="height: 30px; font-size: 10px;">Notes: Felt strong today...</div>
+                    <div class="w-btn" style="margin-top: 8px;">Save Exercise ✓</div>
+                </div>
+            </div>
+            <div class="screen-note">1RM + previous best visible during entry. RPE scale explained inline. Minimal taps.</div>
+        </div>
+
+        <!-- Screen 9: Cardio Log -->
+        <div class="screen-wrapper">
+            <div class="screen-number">3.4</div>
+            <div class="screen-label">Log Cardio</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Cardio Session</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">Activity</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+                        <span class="w-badge active">Running</span>
+                        <span class="w-badge">Cycling</span>
+                        <span class="w-badge">Swimming</span>
+                        <span class="w-badge">Rowing</span>
+                        <span class="w-badge">Walking</span>
+                        <span class="w-badge">Other</span>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">Duration</div>
+                    <div class="w-row">
+                        <div class="w-col"><div class="w-input" style="text-align: center;">30</div></div>
+                        <div style="display: flex; align-items: center; font-size: 10px; padding-bottom: 10px;">minutes</div>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">Intensity</div>
+                    <div class="w-slider-track">
+                        <div class="w-slider-fill"></div>
+                        <div class="w-slider-thumb"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 8px; color: #999; margin-bottom: 14px;">
+                        <span>Easy</span><span>Moderate</span><span>Hard</span><span>Max</span>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">Distance (optional)</div>
+                    <div class="w-row">
+                        <div class="w-col"><div class="w-input" style="text-align: center;">5.2</div></div>
+                        <div style="display: flex; align-items: center; font-size: 10px; padding-bottom: 10px;">km</div>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">Intervals (optional)</div>
+                    <div class="w-input">3 intervals</div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn">Save Cardio ✓</div>
+                </div>
+            </div>
+            <div class="screen-note">Slider for intensity (no jargon). Chips for activity type. Optional fields clearly marked.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Data Review"></div>
+
+    <!-- FLOW 4: HISTORY & PROGRESS -->
+    <div class="section-title">Flow 4: Workout History &amp; Progress</div>
+    <p class="flow-label">Goal: Answer "What did I do?" and "Am I improving?" in one glance</p>
+
+    <div class="screen-grid">
+        <!-- Screen 10: Workout History -->
+        <div class="screen-wrapper">
+            <div class="screen-number">4.1</div>
+            <div class="screen-label">Workout History</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-header-title">History</span>
+                        <span class="w-header-action">Filter ▾</span>
+                    </div>
+
+                    <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                        <span class="w-badge active">All</span>
+                        <span class="w-badge">Strength</span>
+                        <span class="w-badge">Cardio</span>
+                    </div>
+
+                    <div style="font-size: 9px; color: #666; margin-bottom: 6px;">THIS WEEK</div>
+
+                    <div class="w-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 11px; font-weight: bold;">Upper Body Push</div>
+                                <div style="font-size: 9px; color: #666;">Bench Press, Shoulder Press, Triceps</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 10px; font-weight: bold;">Jun 22</div>
+                                <div style="font-size: 8px; color: #666;">45 min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 11px; font-weight: bold;">Running — Easy</div>
+                                <div style="font-size: 9px; color: #666;">5.2 km • 28 min</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 10px; font-weight: bold;">Jun 21</div>
+                                <div style="font-size: 8px; color: #666;">28 min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 11px; font-weight: bold;">Lower Body</div>
+                                <div style="font-size: 9px; color: #666;">Squat, RDL, Calf Raise</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 10px; font-weight: bold;">Jun 20</div>
+                                <div style="font-size: 8px; color: #666;">55 min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 9px; color: #666; margin: 10px 0 6px;">LAST WEEK</div>
+
+                    <div class="w-card" style="opacity: 0.7;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 11px; font-weight: bold;">Upper Body Pull</div>
+                                <div style="font-size: 9px; color: #666;">T-bar Row, Pull-ups, Curls</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 10px; font-weight: bold;">Jun 18</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-bar">
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Home</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Log</span></div>
+                    <div class="nav-item"><div class="nav-icon active"></div><span class="nav-text">History</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Share</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Profile</span></div>
+                </div>
+            </div>
+            <div class="screen-note">Grouped by week. Filter by type. Exercise names visible for quick scan.</div>
+        </div>
+
+        <!-- Screen 11: Exercise Detail -->
+        <div class="screen-wrapper">
+            <div class="screen-number">4.2</div>
+            <div class="screen-label">Exercise Detail</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Bench Press</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div class="w-card highlight">
+                        <div class="w-row" style="margin: 0;">
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value">85kg</div>
+                                <div class="w-metric-label">Est. 1RM</div>
+                            </div>
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value">80kg</div>
+                                <div class="w-metric-label">Best Load</div>
+                            </div>
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value">14</div>
+                                <div class="w-metric-label">Total Sets (Month)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin: 12px 0 8px;">Progression</div>
+                    <div style="height: 80px; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: flex-end; padding: 8px; gap: 4px;">
+                        <div style="flex: 1; background: #ddd; height: 30%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #ddd; height: 40%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #ddd; height: 45%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #bbb; height: 55%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #bbb; height: 60%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #999; height: 65%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #666; height: 72%; border-radius: 2px;"></div>
+                        <div style="flex: 1; background: #111; height: 80%; border-radius: 2px;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 8px; color: #999; margin-top: 4px;">
+                        <span>8 weeks ago</span><span>Today</span>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin: 14px 0 6px;">Recent Sessions</div>
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Jun 22 — 3 sets</div>
+                            <div class="w-list-sub">75kg×8, 70kg×10, 60kg×12 | RPE 8</div>
+                        </div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Jun 18 — 4 sets</div>
+                            <div class="w-list-sub">80kg×5, 70kg×8, 65kg×10, 60kg×12 | RPE 9</div>
+                        </div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Jun 15 — 3 sets</div>
+                            <div class="w-list-sub">75kg×6, 70kg×8, 65kg×10 | RPE 8</div>
+                        </div>
+                    </div>
+
+                    <div class="annotation">Muscles: Chest (primary), Triceps, Anterior Deltoid</div>
+                </div>
+            </div>
+            <div class="screen-note">Key screen for trainers. 1RM + progression chart + session history. Decision-support data.</div>
+        </div>
+
+        <!-- Screen 12: Workout Detail -->
+        <div class="screen-wrapper">
+            <div class="screen-number">4.3</div>
+            <div class="screen-label">Session Detail</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Jun 22 — Upper Push</span>
+                        <span class="w-header-action">Edit</span>
+                    </div>
+
+                    <div style="font-size: 9px; color: #666; margin-bottom: 12px;">Duration: 45 min | 3 exercises | 9 sets total</div>
+
+                    <div class="w-card">
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 6px;">Bench Press</div>
+                        <div style="font-size: 9px; color: #444; line-height: 1.6;">
+                            Set 1: 60kg × 10 @ RPE 7<br>
+                            Set 2: 70kg × 8 @ RPE 8<br>
+                            Set 3: 75kg × 6 @ RPE 9
+                        </div>
+                        <div style="font-size: 8px; color: #666; margin-top: 4px;">Est. 1RM: 85kg</div>
+                    </div>
+
+                    <div class="w-card">
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 6px;">Shoulder Press</div>
+                        <div style="font-size: 9px; color: #444; line-height: 1.6;">
+                            Set 1: 30kg × 10 @ RPE 7<br>
+                            Set 2: 35kg × 8 @ RPE 8<br>
+                            Set 3: 37.5kg × 6 @ RPE 9
+                        </div>
+                        <div style="font-size: 8px; color: #666; margin-top: 4px;">Est. 1RM: 45kg</div>
+                    </div>
+
+                    <div class="w-card">
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 6px;">French Press (Triceps)</div>
+                        <div style="font-size: 9px; color: #444; line-height: 1.6;">
+                            Set 1: 20kg × 12 @ RPE 7<br>
+                            Set 2: 22.5kg × 10 @ RPE 8<br>
+                            Set 3: 25kg × 8 @ RPE 9
+                        </div>
+                    </div>
+
+                    <div class="w-divider"></div>
+                    <div style="font-size: 9px; color: #444;"><strong>Notes:</strong> Felt strong. Shoulder slightly tight on last set.</div>
+                    <div style="flex: 1;"></div>
+                    <div style="display: flex; gap: 8px;">
+                        <div class="w-btn outline" style="flex: 1;">Share</div>
+                        <div class="w-btn" style="flex: 1;">Repeat</div>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note">Complete session view. Share button for sending to trainer. Repeat for quick re-logging.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Data Sharing"></div>
+
+    <!-- FLOW 5: TRAINER SHARING -->
+    <div class="section-title">Flow 5: Trainer Sharing — Data Ownership in Action</div>
+    <p class="flow-label">Goal: Client controls who sees what. Trainer is a guest, not an owner.</p>
+
+    <div class="screen-grid">
+        <!-- Screen 13: Share Hub -->
+        <div class="screen-wrapper">
+            <div class="screen-number">5.1</div>
+            <div class="screen-label">My Team</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-header-title">My Team</span>
+                        <span class="w-header-action">+ Invite</span>
+                    </div>
+
+                    <div class="w-subtitle">You control who sees your data</div>
+
+                    <div class="w-card highlight">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="w-avatar">JB</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 11px; font-weight: bold;">John Bower</div>
+                                <div style="font-size: 9px; color: #666;">Strength Coach</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 8px; color: #4a4;">● Active</div>
+                            </div>
+                        </div>
+                        <div class="w-divider"></div>
+                        <div style="font-size: 9px; color: #666;">Can see: Strength data, PARQ, Notes</div>
+                        <div style="font-size: 9px; color: #999;">Since: Jan 2026 | Sessions shared: 24</div>
+                    </div>
+
+                    <div class="w-card">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="w-avatar">RC</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 11px; font-weight: bold;">Running Coach</div>
+                                <div style="font-size: 9px; color: #666;">Cardio Coach</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 8px; color: #999;">○ Pending</div>
+                            </div>
+                        </div>
+                        <div class="w-divider"></div>
+                        <div style="font-size: 9px; color: #666;">Can see: Cardio data only</div>
+                    </div>
+
+                    <div class="w-divider"></div>
+                    <div style="flex: 1;"></div>
+
+                    <div class="w-card" style="border-style: dashed; text-align: center; padding: 16px;">
+                        <div style="font-size: 11px; font-weight: bold;">+ Add a Professional</div>
+                        <div style="font-size: 9px; color: #666; margin-top: 4px;">Invite trainer, physio, or doctor</div>
+                    </div>
+                </div>
+                <div class="nav-bar">
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Home</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Log</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">History</span></div>
+                    <div class="nav-item"><div class="nav-icon circle active"></div><span class="nav-text">Share</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Profile</span></div>
+                </div>
+            </div>
+            <div class="screen-note">Client's view. They see who has access. They control permissions. Revocable.</div>
+        </div>
+
+        <!-- Screen 14: Access Control -->
+        <div class="screen-wrapper">
+            <div class="screen-number">5.2</div>
+            <div class="screen-label">Access Control</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">John Bower — Access</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <div class="w-avatar" style="margin: 0 auto 8px; width: 48px; height: 48px; font-size: 18px;">JB</div>
+                        <div style="font-size: 12px; font-weight: bold;">John Bower</div>
+                        <div style="font-size: 9px; color: #666;">Strength Coach • Active since Jan 2026</div>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 10px;">Data Access</div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div><div style="font-size: 11px;">Strength workouts</div></div>
+                        <div class="w-toggle on"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div><div style="font-size: 11px;">Cardio sessions</div></div>
+                        <div class="w-toggle"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div><div style="font-size: 11px;">PARQ / Health form</div></div>
+                        <div class="w-toggle on"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div><div style="font-size: 11px;">Session notes</div></div>
+                        <div class="w-toggle on"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div><div style="font-size: 11px;">Body measurements</div></div>
+                        <div class="w-toggle"><div class="w-toggle-dot"></div></div>
+                    </div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn outline" style="color: #c00; border-color: #c00; margin-top: 16px;">Revoke All Access</div>
+                    <div class="annotation">Client has full control. Can revoke anytime. Granular permissions.</div>
+                </div>
+            </div>
+            <div class="screen-note">Toggle-based. Visual clarity on what's shared. Revoke is prominent and honest.</div>
+        </div>
+
+        <!-- Screen 15: Trainer View -->
+        <div class="screen-wrapper">
+            <div class="screen-number">5.3</div>
+            <div class="screen-label">Trainer View</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Client: Jack</span>
+                        <span class="w-header-action">Notes</span>
+                    </div>
+
+                    <div style="background: #f5f5f5; padding: 6px 10px; border-radius: 4px; font-size: 8px; color: #666; margin-bottom: 12px; text-align: center;">
+                        👁 VIEW ONLY — Data owned by client
+                    </div>
+
+                    <div class="w-card highlight">
+                        <div style="font-size: 9px; color: #666;">KEY METRICS</div>
+                        <div class="w-row" style="margin-top: 6px;">
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value" style="font-size: 16px;">85kg</div>
+                                <div class="w-metric-label">Bench 1RM</div>
+                            </div>
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value" style="font-size: 16px;">110kg</div>
+                                <div class="w-metric-label">Squat 1RM</div>
+                            </div>
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value" style="font-size: 16px;">4d</div>
+                                <div class="w-metric-label">Last Session</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin: 10px 0 6px;">Recent Activity</div>
+
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Upper Push — Jun 22</div>
+                            <div class="w-list-sub">Bench 75×6, Shoulder Press 37.5×6</div>
+                        </div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content">
+                            <div class="w-list-title">Lower Body — Jun 20</div>
+                            <div class="w-list-sub">Squat 100×5, RDL 80×8</div>
+                        </div>
+                        <div class="w-list-right">→</div>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin: 10px 0 6px;">PARQ Flags</div>
+                    <div class="w-card" style="background: #fafafa;">
+                        <div style="font-size: 9px; color: #666;">
+                            ⚠ Intermittent breathing condition (inhaler)<br>
+                            ⚠ No cardiovascular conditions<br>
+                            ✓ Medical clearance: Yes
+                        </div>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin: 10px 0 6px;">Muscle Group Frequency (14 days)</div>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        <span class="w-badge active">Chest ×4</span>
+                        <span class="w-badge active">Quads ×3</span>
+                        <span class="w-badge">Back ×2</span>
+                        <span class="w-badge">Arms ×2</span>
+                        <span class="w-badge" style="opacity: 0.5;">Calves ×0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note">Trainer sees client data as read-only guest. 1RM, flags, muscle frequency all surfaced.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Health Intake"></div>
+
+    <!-- FLOW 6: PARQ -->
+    <div class="section-title">Flow 6: PARQ — Health Readiness Form</div>
+    <p class="flow-label">Goal: Capture medical constraints progressively. Not blocking first workout.</p>
+
+    <div class="screen-grid">
+        <!-- Screen 16: PARQ Start -->
+        <div class="screen-wrapper">
+            <div class="screen-number">6.1</div>
+            <div class="screen-label">PARQ Intro</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Health Form</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div class="w-progress"><div class="w-progress-fill" style="width: 10%;"></div></div>
+
+                    <div class="w-title" style="font-size: 14px;">Physical Activity Readiness</div>
+                    <div class="w-subtitle">This helps your team understand your body's constraints. Your data — you control who sees it.</div>
+
+                    <div style="margin-top: 16px;">
+                        <div class="w-text" style="font-weight: bold;">Do you have any heart conditions?</div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <div class="w-btn outline small" style="flex: 1;">No</div>
+                            <div class="w-btn small" style="flex: 1;">Yes</div>
+                        </div>
+
+                        <div class="w-text" style="font-weight: bold;">Any recent surgeries or operations?</div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <div class="w-btn outline small" style="flex: 1;">No</div>
+                            <div class="w-btn outline small" style="flex: 1;">Yes</div>
+                        </div>
+
+                        <div class="w-text" style="font-weight: bold;">Any breathing difficulties?</div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <div class="w-btn outline small" style="flex: 1;">No</div>
+                            <div class="w-btn outline small" style="flex: 1;">Yes</div>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn">Next →</div>
+                    <div style="font-size: 9px; color: #999; text-align: center;">Complete later →</div>
+                </div>
+            </div>
+            <div class="screen-note">Yes/No for speed. One question per concept. Skippable. Progress shown.</div>
+        </div>
+
+        <!-- Screen 17: PARQ Detail -->
+        <div class="screen-wrapper">
+            <div class="screen-number">6.2</div>
+            <div class="screen-label">PARQ Detail</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Health Form</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div class="w-progress"><div class="w-progress-fill" style="width: 60%;"></div></div>
+
+                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">You indicated: Breathing difficulty</div>
+                    <div style="font-size: 9px; color: #666; margin-bottom: 16px;">Please provide more detail so your coach can adapt your training.</div>
+
+                    <div class="w-text" style="font-weight: bold;">Type of condition:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+                        <span class="w-badge active">Asthma</span>
+                        <span class="w-badge">Exercise-induced</span>
+                        <span class="w-badge">COPD</span>
+                        <span class="w-badge">Other</span>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">How often does it affect you?</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+                        <span class="w-badge">Rarely</span>
+                        <span class="w-badge active">Sometimes</span>
+                        <span class="w-badge">Often</span>
+                        <span class="w-badge">Always</span>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">Do you use medication?</div>
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <div class="w-btn small" style="flex: 1;">Yes</div>
+                        <div class="w-btn outline small" style="flex: 1;">No</div>
+                    </div>
+                    <div class="w-input" style="font-size: 10px;">Inhaler (as needed)</div>
+
+                    <div class="w-text" style="font-weight: bold; margin-top: 12px;">Additional notes:</div>
+                    <div class="w-input" style="height: 50px; align-items: flex-start; padding-top: 8px;">Doctor says exercise helps reduce dependency...</div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn">Next →</div>
+                </div>
+            </div>
+            <div class="screen-note">Conditional expansion. Only shown if user flags an issue. Chip-based for speed.</div>
+        </div>
+
+        <!-- Screen 18: PARQ Complete -->
+        <div class="screen-wrapper">
+            <div class="screen-number">6.3</div>
+            <div class="screen-label">PARQ Summary</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Health Summary</span>
+                        <span class="w-header-action">Edit</span>
+                    </div>
+
+                    <div class="w-card highlight" style="text-align: center; padding: 16px;">
+                        <div style="font-size: 24px; margin-bottom: 6px;">✓</div>
+                        <div style="font-size: 12px; font-weight: bold;">Health Form Complete</div>
+                        <div style="font-size: 9px; color: #666;">Last updated: Jun 22, 2026</div>
+                    </div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin: 14px 0 8px;">Your Health Flags</div>
+
+                    <div class="w-card">
+                        <div style="font-size: 11px; font-weight: bold;">⚠ Breathing — Asthma</div>
+                        <div style="font-size: 9px; color: #666;">Sometimes affected • Uses inhaler • Doctor cleared for exercise</div>
+                    </div>
+
+                    <div class="w-card">
+                        <div style="font-size: 11px;">✓ No heart conditions</div>
+                    </div>
+                    <div class="w-card">
+                        <div style="font-size: 11px;">✓ No recent surgeries</div>
+                    </div>
+                    <div class="w-card">
+                        <div style="font-size: 11px;">✓ No joint or bone issues</div>
+                    </div>
+
+                    <div class="w-divider"></div>
+
+                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 6px;">Shared with:</div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <div class="w-avatar" style="width: 28px; height: 28px; font-size: 10px;">JB</div>
+                        <div style="font-size: 9px;">John Bower (Strength)</div>
+                    </div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn outline">Update Health Form</div>
+                </div>
+            </div>
+            <div class="screen-note">Summary view. Editable anytime. Shows who has access. Portable across professionals.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Profile"></div>
+
+    <!-- FLOW 7: PROFILE -->
+    <div class="section-title">Flow 7: Profile &amp; Settings</div>
+    <p class="flow-label">Goal: User sees their identity and data ownership status at a glance</p>
+
+    <div class="screen-grid">
+        <!-- Screen 19: Profile -->
+        <div class="screen-wrapper">
+            <div class="screen-number">7.1</div>
+            <div class="screen-label">My Profile</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+
+                    <div style="text-align: center; margin-bottom: 16px; margin-top: 8px;">
+                        <div class="w-avatar" style="margin: 0 auto 8px; width: 56px; height: 56px; font-size: 22px;">J</div>
+                        <div style="font-size: 14px; font-weight: bold;">Jack</div>
+                        <div style="font-size: 9px; color: #666;">Member since Jun 2026</div>
+                    </div>
+
+                    <div class="w-card" style="background: #f9f9f9;">
+                        <div style="font-size: 9px; color: #666; margin-bottom: 4px;">YOUR DATA SUMMARY</div>
+                        <div class="w-row" style="margin: 0;">
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value" style="font-size: 18px;">24</div>
+                                <div class="w-metric-label">Workouts</div>
+                            </div>
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value" style="font-size: 18px;">2</div>
+                                <div class="w-metric-label">Coaches</div>
+                            </div>
+                            <div class="w-col w-metric">
+                                <div class="w-metric-value" style="font-size: 18px;">✓</div>
+                                <div class="w-metric-label">PARQ Done</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Personal Details</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Health Form (PARQ)</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Body Measurements</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Data &amp; Privacy</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title">Export My Data</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                    <div class="w-list-item">
+                        <div class="w-list-content"><div class="w-list-title" style="color: #c00;">Delete Account</div></div>
+                        <div class="w-list-right">→</div>
+                    </div>
+                </div>
+                <div class="nav-bar">
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Home</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">Log</span></div>
+                    <div class="nav-item"><div class="nav-icon"></div><span class="nav-text">History</span></div>
+                    <div class="nav-item"><div class="nav-icon circle"></div><span class="nav-text">Share</span></div>
+                    <div class="nav-item"><div class="nav-icon circle active"></div><span class="nav-text">Profile</span></div>
+                </div>
+            </div>
+            <div class="screen-note">Export data prominent. Delete account visible. Reinforces ownership at every level.</div>
+        </div>
+
+        <!-- Screen 20: Invite Flow -->
+        <div class="screen-wrapper">
+            <div class="screen-number">7.2</div>
+            <div class="screen-label">Invite Trainer</div>
+            <div class="phone">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                    <div class="status-bar"><span>9:41</span><span>|||</span></div>
+                    <div class="w-header">
+                        <span class="w-back">←</span>
+                        <span class="w-header-title">Invite Professional</span>
+                        <span class="w-header-action"></span>
+                    </div>
+
+                    <div class="w-subtitle">Share your fitness data with a coach or health professional</div>
+
+                    <div class="w-text" style="font-weight: bold;">Their email or username:</div>
+                    <div class="w-input large">john.bower@email.com</div>
+
+                    <div class="w-text" style="font-weight: bold;">Their role:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+                        <span class="w-badge active">Strength Coach</span>
+                        <span class="w-badge">Cardio Coach</span>
+                        <span class="w-badge">Physio</span>
+                        <span class="w-badge">Doctor</span>
+                        <span class="w-badge">Nutritionist</span>
+                        <span class="w-badge">Other</span>
+                    </div>
+
+                    <div class="w-text" style="font-weight: bold;">What can they see?</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span style="font-size: 11px;">Strength workouts</span>
+                        <div class="w-toggle on"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span style="font-size: 11px;">Cardio sessions</span>
+                        <div class="w-toggle"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span style="font-size: 11px;">Health form (PARQ)</span>
+                        <div class="w-toggle on"><div class="w-toggle-dot"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                        <span style="font-size: 11px;">Notes &amp; comments</span>
+                        <div class="w-toggle on"><div class="w-toggle-dot"></div></div>
+                    </div>
+
+                    <div style="flex: 1;"></div>
+                    <div class="w-btn">Send Invitation</div>
+                    <div style="font-size: 8px; color: #999; text-align: center; margin-top: 6px;">You can change or revoke access anytime</div>
+                </div>
+            </div>
+            <div class="screen-note">Client initiates sharing. Granular control. Role-based defaults. Revocable.</div>
+        </div>
+    </div>
+
+    <div class="page-break" data-label="Information Architecture"></div>
+
+    <!-- INFORMATION ARCHITECTURE -->
+    <div class="section-title">Information Architecture — Screen Map</div>
+
+    <div style="max-width: 800px; margin: 0 auto; padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px;">
+        <pre style="font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.8; overflow-x: auto;">┌─────────────────────────────────────────────────────────────────┐
+│                        FitOwn v0.1                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  SPLASH → SIGNUP → QUICK PROFILE → DASHBOARD                    │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ BOTTOM NAV                                                │   │
+│  ├──────────┬──────────┬──────────┬──────────┬──────────────┤   │
+│  │  Home    │   Log    │ History  │  Share   │   Profile    │   │
+│  ├──────────┼──────────┼──────────┼──────────┼──────────────┤   │
+│  │Dashboard │ Select   │ Workout  │ My Team  │ My Profile   │   │
+│  │  - Last  │  Type    │  List    │  - Active│  - Details   │   │
+│  │  workout │  ↓       │  - By    │  coaches │  - PARQ      │   │
+│  │  - Stats │ Select   │   week   │  - Perms │  - Export    │   │
+│  │  - 1RMs  │ Exercise │  - Filter│  ↓       │  - Privacy   │   │
+│  │  - Recent│  ↓       │  ↓       │ Access   │              │   │
+│  │          │ Log Sets │ Exercise │ Control  │              │   │
+│  │          │  - Wt    │ Detail   │  - Toggle│              │   │
+│  │          │  - Reps  │  - 1RM   │  - Revoke│              │   │
+│  │          │  - RPE   │  - Graph │  ↓       │              │   │
+│  │          │  ↓       │  - Hist  │ Invite   │              │   │
+│  │          │ Cardio   │          │  - Email │              │   │
+│  │          │  - Dur   │          │  - Role  │              │   │
+│  │          │  - Int   │          │  - Perms │              │   │
+│  │          │  - Dist  │          │          │              │   │
+│  └──────────┴──────────┴──────────┴──────────┴──────────────┘   │
+│                                                                  │
+│  PARQ FORM (Accessible from Profile + Prompted on Dashboard)    │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ Intro → Questions (Y/N) → Detail (if Yes) → Summary     │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  TRAINER VIEW (Separate login/role)                              │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ Client List → Client Detail → Workout Data (Read-only)   │   │
+│  │ Key data: 1RM per movement, muscle frequency, PARQ flags │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+TOTAL SCREENS: 20 (Client: 16 | Trainer: 4)
+MAX DEPTH: 3 taps from any nav item to any data point
+        </pre>
+    </div>
+
+    <div class="page-break" data-label="Design Notes"></div>
+
+    <!-- DESIGN NOTES -->
+    <div class="section-title">Design Notes for UI/UX Team</div>
+
+    <div style="max-width: 700px; margin: 0 auto; font-size: 12px; line-height: 1.8;">
+        <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="font-weight: bold; margin-bottom: 8px;">PRINCIPLE 1: Data Ownership Visibility</div>
+            <div style="color: #444;">Every screen must subtly reinforce that this is the user's data. The trainer view explicitly states "VIEW ONLY — Data owned by client." Export and delete options are never hidden. The user should feel sovereign over their information at all times.</div>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="font-weight: bold; margin-bottom: 8px;">PRINCIPLE 2: 10-Second Rule for Data Entry</div>
+            <div style="color: #444;">Logging a single set must be completable in under 10 seconds. This means: large tap targets, numeric input with increment buttons (not keyboard), pre-filled values from previous session, and single-tap confirmation. The RPE scale uses plain language ("How hard?") not just numbers.</div>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="font-weight: bold; margin-bottom: 8px;">PRINCIPLE 3: Context at Point of Decision</div>
+            <div style="color: #444;">When logging bench press, the user should see their previous best and estimated 1RM without navigating away. This is the key differentiator — the app surfaces decision-support data where and when it's needed, not buried in a separate analytics section.</div>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="font-weight: bold; margin-bottom: 8px;">PRINCIPLE 4: Progressive Disclosure</div>
+            <div style="color: #444;">The PARQ is not blocking. Workout logging works from day one. Advanced features (sharing, access control) are discoverable but not in the way. The app grows with the user — a Gen Z user logging solo workouts sees a simple tool; an HNI with a coaching team sees a comprehensive data hub.</div>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="font-weight: bold; margin-bottom: 8px;">PRINCIPLE 5: Accessibility Across Ages</div>
+            <div style="color: #444;">Minimum touch target: 44×44px. Body text: 14px minimum. High contrast mode ready. No icon-only navigation — all nav items have text labels. No swipe-to-delete or gesture-only interactions. Every action has an explicit button.</div>
+        </div>
+
+        <div style="padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="font-weight: bold; margin-bottom: 8px;">COLOUR DIRECTION (For Hi-Fi Phase)</div>
+            <div style="color: #444;">
+                Primary: Monochrome (black/white/greys) — signals seriousness, not gamification.<br>
+                Accent: Single colour for progress/positive states (suggest deep teal or forest green).<br>
+                Alert: Warm amber for PARQ flags and constraints.<br>
+                Avoid: Bright fitness app colours (neon green, electric blue) — this is a professional tool, not a game.
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px; padding: 20px; font-size: 10px; color: #999;">
+        FitOwn — Lo-Fi Wireframe v0.1 | 20 Screens | Prepared for UI/UX Design Team<br>
+        Based on: Product Discovery Session + POC Architecture Document<br>
+        Next: Hi-Fi mockup in Figma after wireframe approval
+    </div>
+
+
+
+</body></html>

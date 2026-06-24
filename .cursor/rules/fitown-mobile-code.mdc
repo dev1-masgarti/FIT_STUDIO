@@ -1,0 +1,30 @@
+---
+description: FitOwn mobile implementation — follow module plans, pnpm monorepo, Expo, and fitown-mobile-standards skill
+globs: apps/**,packages/**,supabase/**
+alwaysApply: false
+---
+
+# FitOwn Mobile Implementation
+
+Before writing code:
+
+1. Identify the module plan in @docs/planning/plans/
+2. Confirm current phase in @docs/planning/IMPLEMENTATION_ROADMAP.md
+3. Load skill: `fitown-mobile-standards`
+4. For UI from Figma: load `fitown-figma-mobile`
+
+Stack (details in @docs/planning/TECH_STACK.md):
+
+- Expo + Expo Router + TypeScript + NativeWind
+- Shared packages: `@fitown/types`, `@fitown/utils`, `@fitown/constants`
+- Supabase with RLS — see @docs/planning/plans/09-database-api.md
+
+Implement only features listed in the active module plan's checklist.
+
+## Figma assets (do not skip)
+
+Figma MCP exports are frequently **SVG content saved as `.png`**. They will not render with `require()` + `expo-image`.
+
+- Verify every asset: `file apps/mobile/assets/...` must be PNG/JPEG, not SVG
+- Icons → `components/icons/*Icon.tsx` using `react-native-svg`
+- Full rules: @.cursor/skills/fitown-figma-mobile/references/asset-export.md

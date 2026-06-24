@@ -1,0 +1,93 @@
+{
+  "project_ref": "spcnvkgzzmtdzehrarnp",
+  "project_url": "https://spcnvkgzzmtdzehrarnp.supabase.co",
+  "db_host": "db.spcnvkgzzmtdzehrarnp.supabase.co",
+  "migrations_dir": "../migrations",
+  "generated_at": "2026-03-24T00:00:00Z",
+  "migrations": [
+    {
+      "version": "20260323119900",
+      "filename": "20260323119900_fitown_migration_tracking.sql",
+      "name": "fitown_migration_tracking",
+      "summary": "fitown.schema_migrations tracking table"
+    },
+    {
+      "version": "20260323120000",
+      "filename": "20260323120000_fitown_foundation.sql",
+      "name": "fitown_foundation",
+      "summary": "Extensions, enums, set_updated_at, permission helpers"
+    },
+    {
+      "version": "20260323120100",
+      "filename": "20260323120100_fitown_profiles.sql",
+      "name": "fitown_profiles",
+      "summary": "profiles table, auth trigger, RLS owner policies"
+    },
+    {
+      "version": "20260323120200",
+      "filename": "20260323120200_fitown_exercises.sql",
+      "name": "fitown_exercises",
+      "summary": "exercises catalog table and RLS"
+    },
+    {
+      "version": "20260323120300",
+      "filename": "20260323120300_fitown_workouts.sql",
+      "name": "fitown_workouts",
+      "summary": "workout_sessions, strength_sets, cardio_entries"
+    },
+    {
+      "version": "20260323120400",
+      "filename": "20260323120400_fitown_one_rm.sql",
+      "name": "fitown_one_rm",
+      "summary": "one_rm_estimates table"
+    },
+    {
+      "version": "20260323120500",
+      "filename": "20260323120500_fitown_parq.sql",
+      "name": "fitown_parq",
+      "summary": "parq_responses table"
+    },
+    {
+      "version": "20260323120600",
+      "filename": "20260323120600_fitown_sharing.sql",
+      "name": "fitown_sharing",
+      "summary": "share_invites, access_grants, grantee RLS"
+    },
+    {
+      "version": "20260323120700",
+      "filename": "20260323120700_fitown_seed_exercises.sql",
+      "name": "fitown_seed_exercises",
+      "summary": "Seed 50 system exercises (idempotent)"
+    },
+    {
+      "version": "20260323120800",
+      "filename": "20260323120800_fitown_functions.sql",
+      "name": "fitown_functions",
+      "summary": "has_data_grant and related SECURITY DEFINER helpers"
+    },
+    {
+      "version": "20260324120000",
+      "filename": "20260324120000_fitown_profile_height.sql",
+      "name": "fitown_profile_height",
+      "summary": "profiles.height_cm for onboarding"
+    },
+    {
+      "version": "20260324120100",
+      "filename": "20260324120100_fitown_profile_date_of_birth.sql",
+      "name": "fitown_profile_date_of_birth",
+      "summary": "profiles.date_of_birth for onboarding"
+    },
+    {
+      "version": "20260623170000",
+      "filename": "20260623170000_fitown_profile_home_image.sql",
+      "name": "fitown_profile_home_image",
+      "summary": "profiles country_region and generated home image metadata"
+    },
+    {
+      "version": "20260623174000",
+      "filename": "20260623174000_fitown_e2ee_sync_chat.sql",
+      "name": "fitown_e2ee_sync_chat",
+      "summary": "E2EE device keys, encrypted sync blobs, chat envelopes, and security controls"
+    }
+  ]
+}

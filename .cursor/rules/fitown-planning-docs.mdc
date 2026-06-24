@@ -1,0 +1,17 @@
+---
+description: Standards for editing FitOwn planning documents, product specs, and module plans in docs/planning
+globs: docs/planning/**,docs/**/*.md,AGENTS.md
+alwaysApply: false
+---
+
+# FitOwn Planning Docs
+
+When editing planning files:
+
+- Index lives at @docs/planning/README.md — update links if adding plans
+- Each module plan uses: Objective → Features (checkboxes) → Files to Create → Acceptance Criteria
+- Scope changes go in @docs/planning/PRODUCT.md first, then sync roadmap and module plans
+- Wireframe reference: @docs/MASGARTI's Fit Tech.html
+- Extracted sources: `docs/extracted/` (regenerate via `python3 scripts/extract-docs.py`)
+
+Nested guide: @docs/planning/AGENTS.md
