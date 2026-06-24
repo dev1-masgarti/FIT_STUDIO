@@ -1,0 +1,8 @@
+# git-crypt — files matching these patterns are encrypted before being committed.
+# Anyone without the shared key sees only ciphertext. See README for unlock steps.
+apps/backend/credentials/** filter=git-crypt diff=git-crypt
+apps/mobile/credentials/** filter=git-crypt diff=git-crypt
+**/client_secret_*.json filter=git-crypt diff=git-crypt
+
+# Never encrypt this file itself.
+.gitattributes !filter !diff

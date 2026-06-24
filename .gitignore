@@ -2,11 +2,15 @@
 node_modules/
 .DS_Store
 
-# Secrets & credentials — never commit (templates use *.env.example instead)
-credentials/
-**/credentials/
-*client_secret*.json
-*.plist
+# Local-only env files — never committed (not even encrypted)
 .env
 .env.local
 .env.*.local
+
+# git-crypt key — NEVER commit the key itself
+*.git-crypt-key
+git-crypt-key
+
+# NOTE: credential files under **/credentials/ and client_secret_*.json ARE
+# committed, but ENCRYPTED via git-crypt (see .gitattributes). They are
+# intentionally NOT ignored so the encrypted blobs can be versioned & shared.
