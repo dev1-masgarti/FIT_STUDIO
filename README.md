@@ -19,10 +19,30 @@ pnpm install
 
 ## Run
 
+Start the backend and the mobile dev server (in two terminals):
+
 ```bash
 pnpm dev:backend   # Fastify backend (WebSockets + JWT)
 pnpm dev:mobile    # Expo dev client
 ```
+
+### Run on Android
+
+1. Start an Android emulator (Android Studio → Device Manager) **or** connect a
+   physical device with USB debugging enabled.
+2. Run `pnpm dev:mobile`.
+3. In the Expo terminal, press **`a`** to build/open the app on Android.
+
+### Run on iOS (macOS only)
+
+1. Run `pnpm dev:mobile`.
+2. In the Expo terminal, press **`i`** to open the app in the iOS Simulator.
+
+Other handy Expo keys while `pnpm dev:mobile` is running: **`r`** reload,
+**`j`** open debugger, **`?`** show all commands.
+
+> First launch on a device/emulator compiles the native dev client and can take
+> several minutes; subsequent launches are fast.
 
 ---
 
@@ -44,9 +64,21 @@ Encrypted paths (see [`.gitattributes`](.gitattributes)):
 1. Install git-crypt:
 
    ```bash
-   brew install git-crypt      # macOS
+   brew install git-crypt      # macOS (Homebrew)
    sudo apt install git-crypt  # Debian/Ubuntu
    ```
+
+   **Windows** (run in PowerShell, then use Git Bash for the `git-crypt` commands):
+
+   ```powershell
+   choco install git-crypt     # via Chocolatey
+   # or
+   scoop install git-crypt     # via Scoop
+   ```
+
+   If you don't use a package manager, download the prebuilt `git-crypt.exe`
+   from the [releases page](https://github.com/AGWA/git-crypt/releases) and place
+   it somewhere on your `PATH` (e.g. your Git install's `bin` folder).
 
 2. Get the shared key file (`fitown-git-crypt.key`) from a maintainer over a
    **secure channel** (password manager, encrypted message). Never email,
