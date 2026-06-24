@@ -88,6 +88,18 @@
       "filename": "20260623174000_fitown_e2ee_sync_chat.sql",
       "name": "fitown_e2ee_sync_chat",
       "summary": "E2EE device keys, encrypted sync blobs, chat envelopes, and security controls"
+    },
+    {
+      "version": "20260624130000",
+      "filename": "20260624130000_fitown_backend_store.sql",
+      "name": "fitown_backend_store",
+      "summary": "Fastify backend persistence (backend_users, backend_profiles, sync, chat)"
+    },
+    {
+      "version": "20260624130100",
+      "filename": "20260624130100_fitown_backend_registration_bigint.sql",
+      "name": "fitown_backend_registration_bigint",
+      "summary": "backend_devices.registration_id as bigint for Signal IDs"
     }
   ]
 }

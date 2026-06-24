@@ -11,11 +11,11 @@ import {
 
 import {
   getCurrentSession,
-  signInWithApple,
-  signInWithEmail,
-  signInWithGoogle,
+  signInWithApple as apiSignInWithApple,
+  signInWithEmail as apiSignInWithEmail,
+  signInWithGoogle as apiSignInWithGoogle,
   signOut as authSignOut,
-  signUpWithEmail,
+  signUpWithEmail as apiSignUpWithEmail,
   sendPasswordReset,
 } from '@/lib/api/auth';
 import { isBackendConfigured, type AppSession } from '@/lib/backend/client';
@@ -31,10 +31,11 @@ type AuthContextValue = {
   isLoading: boolean;
   isConfigured: boolean;
   bootstrapError: string | null;
-  signUp: typeof signUpWithEmail;
-  signIn: typeof signInWithEmail;
-  signInGoogle: typeof signInWithGoogle;
-  signInApple: typeof signInWithApple;
+  profileError: string | null;
+  signUp: (input: Parameters<typeof apiSignUpWithEmail>[0]) => Promise<AppSession>;
+  signIn: (input: Parameters<typeof apiSignInWithEmail>[0]) => Promise<AppSession>;
+  signInGoogle: () => Promise<AppSession>;
+  signInApple: () => Promise<AppSession>;
   signOut: () => Promise<void>;
   resetPassword: typeof sendPasswordReset;
   refreshProfile: () => Promise<void>;
@@ -48,16 +49,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const isConfigured = isBackendConfigured();
 
   const loadProfile = useCallback(async (userId: string) => {
     const next = await fetchProfile(userId);
     setProfile(next);
+    setProfileError(null);
+    return next;
   }, []);
+
+  const establishSession = useCallback(
+    async (next: AppSession) => {
+      setSession(next);
+      setBootstrapError(null);
+      registerDeviceKeys(next.user.id, 'primary-mobile').catch((error) => {
+        console.warn('[AuthProvider] device registration failed:', error);
+      });
+      try {
+        await withTimeout(
+          loadProfile(next.user.id),
+          AUTH_BOOTSTRAP_TIMEOUT_MS,
+          'Profile load timed out',
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Unable to load your profile.';
+        setProfile(null);
+        setProfileError(message);
+        console.warn('[AuthProvider] profile load after auth failed:', error);
+      }
+    },
+    [loadProfile],
+  );
 
   const refreshProfile = useCallback(async () => {
     if (!session?.user.id) return;
-    await loadProfile(session.user.id);
+    try {
+      await loadProfile(session.user.id);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unable to refresh your profile.';
+      setProfileError(message);
+      throw error;
+    }
   }, [loadProfile, session?.user.id]);
 
   useEffect(() => {
@@ -76,23 +111,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           'Session restore timed out',
         );
         if (!mounted) return;
-        setSession(current);
         if (current?.user.id) {
-          registerDeviceKeys(current.user.id, 'primary-mobile').catch((error) => {
-            console.warn('[AuthProvider] device registration failed:', error);
-          });
-          // Await the profile so routing decisions (onboarding vs tabs) only run
-          // once we actually know onboarding_complete — otherwise a returning user
-          // is briefly routed back into onboarding on every cold start.
-          try {
-            await withTimeout(
-              loadProfile(current.user.id),
-              AUTH_BOOTSTRAP_TIMEOUT_MS,
-              'Profile load timed out',
-            );
-          } catch (profileError) {
-            console.warn('[AuthProvider] profile load failed:', profileError);
-          }
+          await establishSession(current);
+        } else {
+          setSession(null);
+          setProfile(null);
         }
       } catch (error) {
         if (!mounted) return;
@@ -110,12 +133,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       mounted = false;
     };
-  }, [isConfigured, loadProfile]);
+  }, [isConfigured, establishSession]);
+
+  const signUp = useCallback(
+    async (input: Parameters<typeof apiSignUpWithEmail>[0]) => {
+      const next = await apiSignUpWithEmail(input);
+      await establishSession(next);
+      return next;
+    },
+    [establishSession],
+  );
+
+  const signIn = useCallback(
+    async (input: Parameters<typeof apiSignInWithEmail>[0]) => {
+      const next = await apiSignInWithEmail(input);
+      await establishSession(next);
+      return next;
+    },
+    [establishSession],
+  );
+
+  const signInGoogle = useCallback(async () => {
+    const next = await apiSignInWithGoogle();
+    await establishSession(next);
+    return next;
+  }, [establishSession]);
+
+  const signInApple = useCallback(async () => {
+    const next = await apiSignInWithApple();
+    await establishSession(next);
+    return next;
+  }, [establishSession]);
 
   const signOut = useCallback(async () => {
     await authSignOut();
     setSession(null);
     setProfile(null);
+    setProfileError(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -125,16 +179,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isLoading,
       isConfigured,
       bootstrapError,
-      signUp: signUpWithEmail,
-      signIn: signInWithEmail,
-      signInGoogle: signInWithGoogle,
-      signInApple: signInWithApple,
+      profileError,
+      signUp,
+      signIn,
+      signInGoogle,
+      signInApple,
       signOut,
       resetPassword: sendPasswordReset,
       refreshProfile,
       setProfile,
     }),
-    [session, profile, isLoading, isConfigured, bootstrapError, refreshProfile, signOut],
+    [
+      session,
+      profile,
+      isLoading,
+      isConfigured,
+      bootstrapError,
+      profileError,
+      signUp,
+      signIn,
+      signInGoogle,
+      signInApple,
+      signOut,
+      refreshProfile,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

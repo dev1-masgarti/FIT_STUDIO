@@ -22,9 +22,21 @@ pnpm install
 Start the backend and the mobile dev server (in two terminals):
 
 ```bash
-pnpm dev:backend   # Fastify backend (WebSockets + JWT)
+pnpm dev:backend   # Fastify backend (Postgres + JWT)
 pnpm dev:mobile    # Expo dev client
 ```
+
+### Backend database
+
+The backend stores user accounts and profiles in **Supabase Postgres** (not a local
+JSON file). Before first run:
+
+1. Copy `apps/backend/.env.example` → `apps/backend/.env`
+2. Set `DATABASE_URL` to your Supabase connection string (same value as
+   `supabase/.env.local`)
+3. Apply migrations: `pnpm db:migrate`
+4. If you have legacy data in `apps/backend/data/store.json`, import once:
+   `pnpm --filter @fitown/backend import:store`
 
 ### Run on Android
 

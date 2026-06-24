@@ -10,7 +10,6 @@ import { AppBrandLogo } from '@/components/auth/AppBrandLogo';
 import { PrimaryButton } from '@/components/auth/PrimaryButton';
 import { SocialButton } from '@/components/auth/SocialButton';
 import { colors, fonts, layout } from '@/constants/theme';
-import { ONBOARDING_START } from '@/constants/onboardingRoutes';
 import { useAuth } from '@/providers/AuthProvider';
 import { validateSignUp } from '@fitown/utils';
 
@@ -37,7 +36,7 @@ const SignUpScreen = () => {
     setError(null);
     try {
       await signUp({ fullName, email, password });
-      router.replace(ONBOARDING_START);
+      router.replace('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create account.');
     } finally {
@@ -54,7 +53,7 @@ const SignUpScreen = () => {
       } else {
         await signInApple();
       }
-      router.replace(ONBOARDING_START);
+      router.replace('/');
     } catch (err) {
       const message =
         err instanceof Error ? err.message : `Unable to sign in with ${provider}.`;

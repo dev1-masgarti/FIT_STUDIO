@@ -23,6 +23,12 @@ const toIsoDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
+const parseIsoDate = (value: string | null | undefined): Date | null => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
 const formatGender = (gender: string | null): string => {
   if (gender === 'male') return 'Male';
   if (gender === 'female') return 'Female';
@@ -44,36 +50,57 @@ const SummaryStat = ({ label, value }: SummaryStatProps) => (
 );
 
 const CompleteScreen = () => {
-  const { session, setProfile } = useAuth();
+  const { session, profile, setProfile } = useAuth();
   const { draft } = useOnboarding();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const firstName = firstNameFromFullName(draft.fullName);
-  const age = draft.dateOfBirth ? ageFromDateOfBirth(draft.dateOfBirth) : null;
-  const bmi = computeBmi(draft.weightKg, draft.heightCm);
+  const resolvedFullName = draft.fullName.trim() || profile?.full_name || '';
+  const resolvedGender = draft.gender ?? profile?.gender ?? null;
+  const resolvedDateOfBirth =
+    draft.dateOfBirth ?? parseIsoDate(profile?.date_of_birth ?? null);
+  const resolvedHeightCm = draft.heightCm || profile?.height_cm || 170;
+  const resolvedWeightKg = draft.weightKg || profile?.body_weight_kg || 70;
+  const resolvedGoals = draft.goals.length > 0 ? draft.goals : profile?.focus ?? [];
+
+  const firstName = firstNameFromFullName(resolvedFullName);
+  const age = resolvedDateOfBirth ? ageFromDateOfBirth(resolvedDateOfBirth) : profile?.age;
+  const bmi = computeBmi(resolvedWeightKg, resolvedHeightCm);
   const weightLabel =
     draft.weightUnit === 'kg'
-      ? `${Math.round(draft.weightKg)} kg`
-      : `${kgToLb(draft.weightKg)} lb`;
+      ? `${Math.round(resolvedWeightKg)} kg`
+      : `${kgToLb(resolvedWeightKg)} lb`;
 
   const handleGoHome = async () => {
-    if (!session?.user.id || !draft.gender || !draft.dateOfBirth) return;
+    if (!session?.user.id) {
+      setError('Your session expired. Please log in again.');
+      return;
+    }
+
+    if (!resolvedGender || !resolvedDateOfBirth) {
+      setError('Missing profile details. Go back and complete all onboarding steps.');
+      return;
+    }
+
+    if (!resolvedFullName) {
+      setError('Please enter your name before continuing.');
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
     try {
-      const profile = await completeOnboarding(session.user.id, {
-        full_name: draft.fullName.trim(),
-        age: ageFromDateOfBirth(draft.dateOfBirth),
-        date_of_birth: toIsoDate(draft.dateOfBirth),
-        gender: draft.gender,
-        height_cm: draft.heightCm,
-        body_weight_kg: draft.weightKg,
-        focus: draft.goals,
+      const nextProfile = await completeOnboarding(session.user.id, {
+        full_name: resolvedFullName,
+        age: ageFromDateOfBirth(resolvedDateOfBirth),
+        date_of_birth: toIsoDate(resolvedDateOfBirth),
+        gender: resolvedGender,
+        height_cm: resolvedHeightCm,
+        body_weight_kg: resolvedWeightKg,
+        focus: resolvedGoals,
       });
-      setProfile(profile);
+      setProfile(nextProfile);
       router.replace('/(tabs)');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save your profile.');
@@ -115,11 +142,11 @@ const CompleteScreen = () => {
         <View style={styles.card}>
           <View style={styles.statsRow}>
             <SummaryStat label="Age" value={age != null ? `${age} yrs` : '—'} />
-            <SummaryStat label="Gender" value={formatGender(draft.gender)} />
+            <SummaryStat label="Gender" value={formatGender(resolvedGender)} />
           </View>
 
           <View style={styles.statsRow}>
-            <SummaryStat label="Height" value={`${draft.heightCm} cm`} />
+            <SummaryStat label="Height" value={`${resolvedHeightCm} cm`} />
             <SummaryStat label="Weight" value={weightLabel} />
           </View>
 

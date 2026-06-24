@@ -2,6 +2,9 @@
 node_modules/
 .DS_Store
 
+# Legacy file-based backend store (replaced by Postgres)
+apps/backend/data/
+
 # Local-only env files — never committed (not even encrypted)
 .env
 .env.local

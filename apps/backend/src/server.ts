@@ -1,20 +1,34 @@
+import './load-env.js';
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import websocket from '@fastify/websocket';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { z } from 'zod';
 
+import { hashPassword, uid, verifyPassword } from './crypto.js';
+import { getDb } from './db/client.js';
 import {
-  hashPassword,
-  loadStore,
-  saveStore,
-  uid,
-  verifyPassword,
+  createUserWithProfile,
+  findProfileByUserId,
+  findUserByEmail,
+  findUserById,
+  insertMessageEnvelope,
+  insertWrappedGrantKey,
+  isTokenRevoked,
+  listMessageEnvelopes,
+  pullSyncBlobs,
+  pushSyncBlobs,
+  registerDevice,
+  revokeToken,
+  revokeWrappedGrantKeys,
+  updateMessageReceipt,
+  updateProfile,
+  upsertSocialUser,
   type MessageEnvelope,
   type ProfileRecord,
-  type SyncBlob,
   type WrappedGrantKey,
-} from './store.js';
+} from './db/repository.js';
 import {
   getBearerToken,
   signAccessToken,
@@ -33,6 +47,9 @@ const appleAllowedAudiences = (process.env.APPLE_OAUTH_AUDIENCES ?? 'com.masgart
   .map((value) => value.trim())
   .filter(Boolean);
 const appleJwks = createRemoteJWKSet(new URL('https://appleid.apple.com/auth/keys'));
+
+// Fail fast if Postgres is not configured.
+getDb();
 
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: true });
@@ -54,62 +71,6 @@ const createSessionPayload = (user: { id: string; email: string }) => ({
   user: { id: user.id, email: user.email },
   expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
 });
-
-const upsertSocialUser = async (input: {
-  email: string;
-  fullName: string;
-  store: Awaited<ReturnType<typeof loadStore>>;
-}) => {
-  const existing = input.store.users.find((user) => user.email === input.email);
-  if (existing) {
-    if (input.fullName && existing.fullName !== input.fullName) {
-      existing.fullName = input.fullName;
-      const profile = input.store.profiles.find((p) => p.id === existing.id);
-      if (profile) {
-        profile.full_name = input.fullName;
-        profile.updated_at = new Date().toISOString();
-      }
-      await saveStore(input.store);
-    }
-    return existing;
-  }
-
-  const now = new Date().toISOString();
-  const generatedPassword = uid();
-  const { hash, salt } = hashPassword(generatedPassword);
-  const userId = uid();
-  const user = {
-    id: userId,
-    email: input.email,
-    fullName: input.fullName,
-    passwordHash: hash,
-    passwordSalt: salt,
-    createdAt: now,
-  };
-  input.store.users.push(user);
-
-  const profile: ProfileRecord = {
-    id: userId,
-    full_name: input.fullName,
-    age: null,
-    date_of_birth: null,
-    gender: null,
-    country_region: null,
-    height_cm: null,
-    body_weight_kg: null,
-    focus: [],
-    role: 'client',
-    onboarding_complete: false,
-    home_image_url: null,
-    home_image_signature: null,
-    home_image_generated_at: null,
-    created_at: now,
-    updated_at: now,
-  };
-  input.store.profiles.push(profile);
-  await saveStore(input.store);
-  return user;
-};
 
 const verifyGoogleIdentityToken = async (
   idToken: string,
@@ -163,16 +124,16 @@ const requireUser = async (authorization?: string) => {
   if (!authorization?.startsWith('Bearer ')) return null;
   const token = authorization.slice('Bearer '.length).trim();
   const payload = verifyAccessToken(token);
-  const store = await loadStore();
-  if (store.revokedTokens.includes(token)) return null;
-  const user = store.users.find((u) => u.id === payload.sub && u.email === payload.email);
-  if (!user) return null;
-  return { token, payload, user, store };
+  if (await isTokenRevoked(token)) return null;
+  const user = await findUserById(payload.sub);
+  if (!user || user.email !== payload.email) return null;
+  return { token, payload, user };
 };
 
 app.get('/health', async () => ({
   ok: true,
   service: 'fitown-backend',
+  storage: 'postgres',
   ts: new Date().toISOString(),
 }));
 
@@ -218,46 +179,23 @@ app.post('/auth/sign-up', async (request, reply) => {
     return reply.status(400).send({ error: 'Invalid sign-up payload' });
   }
 
-  const store = await loadStore();
   const email = parsed.data.email.trim().toLowerCase();
-  if (store.users.some((u) => u.email === email)) {
+  if (await findUserByEmail(email)) {
     return reply.status(409).send({ error: 'An account with this email already exists.' });
   }
 
   const { hash, salt } = hashPassword(parsed.data.password);
   const userId = uid();
-  const now = new Date().toISOString();
-  store.users.push({
+  const { user, profile } = await createUserWithProfile({
     id: userId,
     email,
     fullName: parsed.data.fullName.trim(),
     passwordHash: hash,
     passwordSalt: salt,
-    createdAt: now,
   });
-  const profile: ProfileRecord = {
-    id: userId,
-    full_name: parsed.data.fullName.trim(),
-    age: null,
-    date_of_birth: null,
-    gender: null,
-    country_region: null,
-    height_cm: null,
-    body_weight_kg: null,
-    focus: [],
-    role: 'client',
-    onboarding_complete: false,
-    home_image_url: null,
-    home_image_signature: null,
-    home_image_generated_at: null,
-    created_at: now,
-    updated_at: now,
-  };
-  store.profiles.push(profile);
-  await saveStore(store);
 
   return reply.send({
-    session: createSessionPayload({ id: userId, email }),
+    session: createSessionPayload({ id: user.id, email: user.email }),
     profile,
   });
 });
@@ -271,16 +209,15 @@ app.post('/auth/sign-in', async (request, reply) => {
   if (!parsed.success) {
     return reply.status(400).send({ error: 'Invalid sign-in payload' });
   }
-  const store = await loadStore();
   const email = parsed.data.email.trim().toLowerCase();
-  const user = store.users.find((u) => u.email === email);
+  const user = await findUserByEmail(email);
   if (!user) return reply.status(401).send({ error: 'Incorrect email or password.' });
   if (!verifyPassword(parsed.data.password, user.passwordHash, user.passwordSalt)) {
     return reply.status(401).send({ error: 'Incorrect email or password.' });
   }
-  const profile = store.profiles.find((p) => p.id === user.id) ?? null;
+  const profile = await findProfileByUserId(user.id);
   return reply.send({
-    session: createSessionPayload(user),
+    session: createSessionPayload({ id: user.id, email: user.email }),
     profile,
   });
 });
@@ -298,19 +235,12 @@ app.post('/auth/social-sign-in', async (request, reply) => {
   }
 
   try {
-    const store = await loadStore();
     const providerIdentity =
       parsed.data.provider === 'google'
         ? await verifyGoogleIdentityToken(parsed.data.idToken)
         : await verifyAppleIdentityToken(parsed.data.idToken);
 
-    const email = (
-      providerIdentity.email ??
-      parsed.data.email ??
-      ''
-    )
-      .trim()
-      .toLowerCase();
+    const email = (providerIdentity.email ?? parsed.data.email ?? '').trim().toLowerCase();
     if (!email) {
       return reply.status(400).send({ error: 'Your social account did not provide an email.' });
     }
@@ -319,15 +249,19 @@ app.post('/auth/social-sign-in', async (request, reply) => {
       parsed.data.fullName?.trim() ||
       (email.includes('@') ? email.split('@')[0] : 'Athlete');
 
+    const generatedPassword = uid();
+    const { hash, salt } = hashPassword(generatedPassword);
     const user = await upsertSocialUser({
       email,
       fullName,
-      store,
+      passwordHash: hash,
+      passwordSalt: salt,
+      userId: uid(),
     });
-    const profile = store.profiles.find((p) => p.id === user.id) ?? null;
+    const profile = await findProfileByUserId(user.id);
 
     return reply.send({
-      session: createSessionPayload(user),
+      session: createSessionPayload({ id: user.id, email: user.email }),
       profile,
     });
   } catch (error) {
@@ -339,7 +273,7 @@ app.post('/auth/social-sign-in', async (request, reply) => {
 app.get('/auth/session', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
-  const profile = auth.store.profiles.find((p) => p.id === auth.user.id) ?? null;
+  const profile = await findProfileByUserId(auth.user.id);
   return reply.send({
     session: {
       accessToken: auth.token,
@@ -355,8 +289,7 @@ app.post('/auth/sign-out', async (request, reply) => {
   if (!token) return reply.send({ ok: true });
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return reply.send({ ok: true });
-  auth.store.revokedTokens.push(token);
-  await saveStore(auth.store);
+  await revokeToken(token);
   return reply.send({ ok: true });
 });
 
@@ -367,7 +300,7 @@ app.post('/auth/forgot-password', async (_request, reply) => {
 app.get('/profile/me', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
-  const profile = auth.store.profiles.find((p) => p.id === auth.user.id);
+  const profile = await findProfileByUserId(auth.user.id);
   if (!profile) return reply.status(404).send({ error: 'Profile not found' });
   return reply.send(profile);
 });
@@ -375,8 +308,6 @@ app.get('/profile/me', async (request, reply) => {
 app.patch('/profile/me', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
-  const profile = auth.store.profiles.find((p) => p.id === auth.user.id);
-  if (!profile) return reply.status(404).send({ error: 'Profile not found' });
   const patch = (request.body ?? {}) as Record<string, unknown>;
   const allowedKeys: (keyof ProfileRecord)[] = [
     'full_name',
@@ -392,13 +323,14 @@ app.patch('/profile/me', async (request, reply) => {
     'home_image_signature',
     'home_image_generated_at',
   ];
+  const nextPatch: Partial<ProfileRecord> = {};
   for (const key of allowedKeys) {
     if (key in patch) {
-      (profile[key] as unknown) = patch[key];
+      (nextPatch as Record<string, unknown>)[key] = patch[key];
     }
   }
-  profile.updated_at = new Date().toISOString();
-  await saveStore(auth.store);
+  const profile = await updateProfile(auth.user.id, nextPatch);
+  if (!profile) return reply.status(404).send({ error: 'Profile not found' });
   return reply.send(profile);
 });
 
@@ -409,60 +341,32 @@ app.post('/devices/register', async (request, reply) => {
   const registrationId = Number(body.registration_id ?? 0);
   if (!registrationId) return reply.status(400).send({ error: 'registration_id is required' });
 
-  const existing = auth.store.devices.find(
-    (d) => d.userId === auth.user.id && d.registrationId === registrationId,
-  );
-  if (existing) {
-    existing.lastSeenAt = new Date().toISOString();
-    await saveStore(auth.store);
-    return reply.send({ deviceId: existing.id });
-  }
-
-  const next = {
-    id: uid(),
+  const deviceId = await registerDevice({
     userId: auth.user.id,
+    deviceId: uid(),
     deviceLabel: String(body.device_label ?? 'mobile'),
     identityKeyPublic: String(body.identity_key_public ?? ''),
     signingKeyPublic: String(body.signing_key_public ?? ''),
     registrationId,
-    isRevoked: false,
-    lastSeenAt: new Date().toISOString(),
-  };
-  auth.store.devices.push(next);
-  await saveStore(auth.store);
-  return reply.send({ deviceId: next.id });
+  });
+  return reply.send({ deviceId });
 });
 
 app.post('/sync/push', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
   const body = (request.body ?? {}) as { changes?: Array<Record<string, unknown>> };
-  const changes = body.changes ?? [];
-  let inserted = 0;
-  for (const item of changes) {
-    const idempotencyKey = String(item.idempotency_key ?? '');
-    if (!idempotencyKey) continue;
-    const exists = auth.store.syncBlobs.some(
-      (blob) => blob.ownerId === auth.user.id && blob.idempotencyKey === idempotencyKey,
-    );
-    if (exists) continue;
-    const row: SyncBlob = {
-      id: uid(),
-      ownerId: auth.user.id,
-      entityType: String(item.entity_type ?? ''),
-      entityId: String(item.entity_id ?? ''),
-      payloadCiphertext: String(item.payload_ciphertext ?? ''),
-      payloadNonce: String(item.payload_nonce ?? ''),
-      keyVersion: Number(item.key_version ?? 1),
-      idempotencyKey,
-      recordVersion: Number(item.record_version ?? 1),
-      isDeleted: Boolean(item.is_deleted ?? false),
-      updatedAt: new Date().toISOString(),
-    };
-    auth.store.syncBlobs.push(row);
-    inserted += 1;
-  }
-  await saveStore(auth.store);
+  const changes = (body.changes ?? []).map((item) => ({
+    entity_type: String(item.entity_type ?? ''),
+    entity_id: String(item.entity_id ?? ''),
+    payload_ciphertext: String(item.payload_ciphertext ?? ''),
+    payload_nonce: String(item.payload_nonce ?? ''),
+    key_version: Number(item.key_version ?? 1),
+    idempotency_key: String(item.idempotency_key ?? ''),
+    record_version: Number(item.record_version ?? 1),
+    is_deleted: Boolean(item.is_deleted ?? false),
+  }));
+  const inserted = await pushSyncBlobs(auth.user.id, changes);
   emitUserEvent(auth.user.id, 'sync_updated', { inserted });
   return reply.send({ inserted });
 });
@@ -471,21 +375,8 @@ app.get('/sync/pull', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
   const since = String((request.query as { since?: string }).since ?? new Date(0).toISOString());
-  const items = auth.store.syncBlobs
-    .filter((b) => b.ownerId === auth.user.id && b.updatedAt > since)
-    .sort((a, b) => a.updatedAt.localeCompare(b.updatedAt))
-    .slice(0, 300)
-    .map((b) => ({
-      entity_type: b.entityType,
-      entity_id: b.entityId,
-      payload_ciphertext: b.payloadCiphertext,
-      payload_nonce: b.payloadNonce,
-      key_version: b.keyVersion,
-      record_version: b.recordVersion,
-      is_deleted: b.isDeleted,
-      updated_at: b.updatedAt,
-    }));
-  return reply.send({ changes: items });
+  const changes = await pullSyncBlobs(auth.user.id, since);
+  return reply.send({ changes });
 });
 
 app.post('/chat/messages/send', async (request, reply) => {
@@ -506,8 +397,7 @@ app.post('/chat/messages/send', async (request, reply) => {
     deliveredAt: null,
     readAt: null,
   };
-  auth.store.messageEnvelopes.push(envelope);
-  await saveStore(auth.store);
+  await insertMessageEnvelope(envelope);
   emitUserEvent(envelope.recipientUserId, 'chat_message', { messageId: envelope.id });
   return reply.send({ id: envelope.id });
 });
@@ -516,13 +406,7 @@ app.get('/chat/messages/:conversationId', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
   const conversationId = (request.params as { conversationId: string }).conversationId;
-  const items = auth.store.messageEnvelopes
-    .filter(
-      (m) =>
-        m.conversationId === conversationId &&
-        (m.senderUserId === auth.user.id || m.recipientUserId === auth.user.id),
-    )
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const items = await listMessageEnvelopes(conversationId, auth.user.id);
   return reply.send({ items });
 });
 
@@ -531,15 +415,12 @@ app.post('/chat/messages/:messageId/receipt', async (request, reply) => {
   if (!auth) return unauthorized(reply);
   const messageId = (request.params as { messageId: string }).messageId;
   const body = (request.body ?? {}) as { status?: 'delivered' | 'read' };
-  const message = auth.store.messageEnvelopes.find((m) => m.id === messageId);
+  const message = await updateMessageReceipt(
+    messageId,
+    auth.user.id,
+    body.status === 'read' ? 'read' : 'delivered',
+  );
   if (!message) return reply.status(404).send({ error: 'Message not found' });
-  if (message.recipientUserId !== auth.user.id) return reply.status(403).send({ error: 'Forbidden' });
-  if (body.status === 'read') {
-    message.readAt = new Date().toISOString();
-  } else {
-    message.deliveredAt = new Date().toISOString();
-  }
-  await saveStore(auth.store);
   emitUserEvent(message.senderUserId, 'chat_receipt', {
     messageId,
     status: body.status ?? 'delivered',
@@ -571,8 +452,7 @@ app.post('/share/wrapped-key', async (request, reply) => {
     revokedAt: null,
     createdAt: new Date().toISOString(),
   };
-  auth.store.wrappedGrantKeys.push(row);
-  await saveStore(auth.store);
+  await insertWrappedGrantKey(row);
   emitUserEvent(row.granteeId, 'wrapped_key', { accessGrantId: row.accessGrantId });
   return reply.send({ id: row.id });
 });
@@ -582,22 +462,21 @@ app.post('/share/wrapped-key/revoke', async (request, reply) => {
   if (!auth) return unauthorized(reply);
   const body = (request.body ?? {}) as { access_grant_id?: string; key_version?: number };
   const grantId = String(body.access_grant_id ?? '');
-  auth.store.wrappedGrantKeys.forEach((item) => {
-    if (item.clientId === auth.user.id && item.accessGrantId === grantId && item.isActive) {
-      item.isActive = false;
-      item.keyVersion = Number(body.key_version ?? item.keyVersion);
-      item.revokedAt = new Date().toISOString();
-      emitUserEvent(item.granteeId, 'wrapped_key_revoked', { accessGrantId: grantId });
-    }
+  const revoked = await revokeWrappedGrantKeys({
+    clientId: auth.user.id,
+    accessGrantId: grantId,
+    keyVersion: body.key_version,
   });
-  await saveStore(auth.store);
+  for (const item of revoked) {
+    emitUserEvent(item.granteeId, 'wrapped_key_revoked', { accessGrantId: item.accessGrantId });
+  }
   return reply.send({ ok: true });
 });
 
 app.post('/home-image/generate', async (request, reply) => {
   const auth = await requireUser(request.headers.authorization);
   if (!auth) return unauthorized(reply);
-  const profile = auth.store.profiles.find((p) => p.id === auth.user.id);
+  const profile = await findProfileByUserId(auth.user.id);
   if (!profile) return reply.status(404).send({ error: 'Profile not found' });
 
   const body = (request.body ?? {}) as { region?: string };
@@ -607,16 +486,15 @@ app.post('/home-image/generate', async (request, reply) => {
     return reply.send({ image_url: profile.home_image_url, cached: true });
   }
 
-  // Dedicated backend path. Plug external providers here when configured.
   const placeholder = `https://placehold.co/600x600/0c0c0c/ffffff.png?text=${encodeURIComponent(profile.full_name || 'Athlete')}`;
-  profile.home_image_url = placeholder;
-  profile.home_image_signature = signature;
-  profile.home_image_generated_at = new Date().toISOString();
-  profile.country_region = region;
-  profile.updated_at = new Date().toISOString();
-  await saveStore(auth.store);
-  return reply.send({ image_url: placeholder, cached: false });
+  const updated = await updateProfile(auth.user.id, {
+    home_image_url: placeholder,
+    home_image_signature: signature,
+    home_image_generated_at: new Date().toISOString(),
+    country_region: region,
+  });
+  return reply.send({ image_url: updated?.home_image_url ?? placeholder, cached: false });
 });
 
 await app.listen({ port, host });
-app.log.info(`Fitown backend running on http://${host}:${port}`);
+app.log.info(`Fitown backend running on http://${host}:${port} (Postgres)`);

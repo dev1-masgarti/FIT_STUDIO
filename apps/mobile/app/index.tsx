@@ -1,12 +1,13 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ONBOARDING_START } from '@/constants/onboardingRoutes';
 import { colors, fonts } from '@/constants/theme';
 import { useAuth } from '@/providers/AuthProvider';
 
 const Index = () => {
-  const { isLoading, isConfigured, bootstrapError, session, profile } = useAuth();
+  const { isLoading, isConfigured, bootstrapError, profileError, session, profile, refreshProfile } =
+    useAuth();
 
   if (isLoading) {
     return (
@@ -44,7 +45,27 @@ const Index = () => {
     return <Redirect href="/(auth)/splash" />;
   }
 
-  if (!profile?.onboarding_complete) {
+  // Signed in but profile could not be loaded — do NOT treat this as incomplete onboarding.
+  if (!profile) {
+    return (
+      <View style={styles.loading}>
+        <Text style={styles.configTitle}>Could not load profile</Text>
+        <Text style={styles.configText}>
+          {profileError ?? 'Your session is valid but profile data is unavailable.'}
+        </Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={() => refreshProfile().catch(() => undefined)}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading profile"
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  if (!profile.onboarding_complete) {
     return <Redirect href={ONBOARDING_START} />;
   }
 
@@ -88,5 +109,19 @@ const styles = StyleSheet.create({
     color: colors.label,
     textAlign: 'center',
     marginTop: 8,
+  },
+  retryButton: {
+    marginTop: 8,
+    minHeight: 44,
+    borderRadius: 22,
+    backgroundColor: colors.accent,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  retryButtonText: {
+    fontFamily: fonts.semiBold,
+    fontSize: 15,
+    color: colors.black,
   },
 });
