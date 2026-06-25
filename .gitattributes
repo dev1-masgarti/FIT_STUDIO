@@ -3,6 +3,7 @@
 apps/backend/credentials/** filter=git-crypt diff=git-crypt
 apps/mobile/credentials/** filter=git-crypt diff=git-crypt
 **/client_secret_*.json filter=git-crypt diff=git-crypt
+supabase/.env filter=git-crypt diff=git-crypt
 
 # Never encrypt this file itself.
 .gitattributes !filter !diff

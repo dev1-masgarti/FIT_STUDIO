@@ -31,19 +31,27 @@ pnpm dev:mobile    # Expo dev client
 The backend stores user accounts and profiles in **Supabase Postgres** (not a local
 JSON file). Before first run:
 
-1. Copy `apps/backend/.env.example` → `apps/backend/.env`
-2. Set `DATABASE_URL` to your Supabase connection string (same value as
-   `supabase/.env.local`)
-3. Apply migrations: `pnpm db:migrate`
-4. If you have legacy data in `apps/backend/data/store.json`, import once:
+1. Create `supabase/.env` (or `supabase/.env.local`) with `DATABASE_URL` — see
+   `supabase/.env.example`. The backend loads this automatically; a separate
+   `apps/backend/.env` is optional.
+2. Apply migrations: `pnpm db:migrate` (requires `psql` — `brew install libpq`)
+3. If you have legacy data in `apps/backend/data/store.json`, import once:
    `pnpm --filter @fitown/backend import:store`
 
 ### Run on Android
 
+**First time only** — install the development build (Expo Go is not supported):
+
+```bash
+./dev.sh --android    # builds native app + starts Metro (~2–5 min)
+```
+
+Daily development:
+
 1. Start an Android emulator (Android Studio → Device Manager) **or** connect a
    physical device with USB debugging enabled.
-2. Run `pnpm dev:mobile`.
-3. In the Expo terminal, press **`a`** to build/open the app on Android.
+2. Run `pnpm dev:backend` and `pnpm dev:mobile` (or `./dev.sh --local` for mobile).
+3. Press **`a`** in the Expo terminal to open the app.
 
 ### Run on iOS (macOS only)
 
@@ -70,6 +78,7 @@ Encrypted paths (see [`.gitattributes`](.gitattributes)):
 - `apps/backend/credentials/**`
 - `apps/mobile/credentials/**`
 - `**/client_secret_*.json`
+- `supabase/.env` (DATABASE_URL + service role key — never commit plaintext)
 
 ### First-time setup (new teammate)
 

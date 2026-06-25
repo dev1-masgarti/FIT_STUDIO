@@ -5,10 +5,14 @@ node_modules/
 # Legacy file-based backend store (replaced by Postgres)
 apps/backend/data/
 
-# Local-only env files — never committed (not even encrypted)
+# Local-only env files — never committed in plaintext
 .env
 .env.local
 .env.*.local
+**/.env
+**/.env.local
+# Exception: supabase/.env is git-crypt encrypted (see .gitattributes)
+!supabase/.env
 
 # git-crypt key — NEVER commit the key itself
 *.git-crypt-key

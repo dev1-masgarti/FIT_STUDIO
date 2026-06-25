@@ -1,5 +1,5 @@
 .branches
 .temp
-.env
+# supabase/.env is tracked and encrypted via git-crypt (repo root .gitattributes)
 .env.local
 .env*.local

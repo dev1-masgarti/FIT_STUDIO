@@ -10,10 +10,17 @@ KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ROOT_DIR="$(cd "$KIT_DIR/../.." && pwd)"
 MIG_DIR="$ROOT_DIR/supabase/migrations"
 MANIFEST="$KIT_DIR/manifest.json"
-ENV_LOCAL="$ROOT_DIR/supabase/.env.local"
+ENV_FILE="$ROOT_DIR/supabase/.env"
 LOCAL_STATE="$KIT_DIR/local-state.json"
 
 load_database_url() {
+  if [[ -z "${DATABASE_URL:-}" && -f "$ENV_FILE" ]]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$ENV_FILE"
+    set +a
+  fi
+
   if [[ -z "${DATABASE_URL:-}" && -f "$ENV_LOCAL" ]]; then
     set -a
     # shellcheck disable=SC1090
@@ -23,7 +30,7 @@ load_database_url() {
 
   if [[ -z "${DATABASE_URL:-}" ]]; then
     echo "ERROR: DATABASE_URL is not set." >&2
-    echo "       Add to supabase/.env.local (see supabase/.env.example)" >&2
+    echo "       Add to supabase/.env or supabase/.env.local (see supabase/.env.example)" >&2
     exit 1
   fi
 }

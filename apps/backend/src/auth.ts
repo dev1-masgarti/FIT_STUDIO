@@ -28,6 +28,14 @@ export const verifyAccessToken = (token: string): AuthTokenPayload => {
   return { sub, email };
 };
 
+export const tryVerifyAccessToken = (token: string): AuthTokenPayload | null => {
+  try {
+    return verifyAccessToken(token);
+  } catch {
+    return null;
+  }
+};
+
 export const getBearerToken = (request: FastifyRequest): string | null => {
   const value = request.headers.authorization;
   if (!value || !value.startsWith('Bearer ')) return null;

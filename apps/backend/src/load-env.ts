@@ -28,6 +28,13 @@ const parseEnvFile = (filePath: string): void => {
 
 const backendDir = path.resolve(import.meta.dirname, '..');
 const repoRoot = path.resolve(backendDir, '../..');
+const supabaseDir = path.join(repoRoot, 'supabase');
 
-parseEnvFile(path.join(backendDir, '.env'));
-parseEnvFile(path.join(repoRoot, 'supabase', '.env.local'));
+// Later files do not override vars already set in the shell or earlier files.
+for (const file of [
+  path.join(supabaseDir, '.env'),
+  path.join(supabaseDir, '.env.local'),
+  path.join(backendDir, '.env'),
+]) {
+  parseEnvFile(file);
+}

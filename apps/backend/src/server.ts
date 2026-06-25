@@ -32,6 +32,7 @@ import {
 import {
   getBearerToken,
   signAccessToken,
+  tryVerifyAccessToken,
   unauthorized,
   verifyAccessToken,
 } from './auth.js';
@@ -123,7 +124,8 @@ const verifyAppleIdentityToken = async (
 const requireUser = async (authorization?: string) => {
   if (!authorization?.startsWith('Bearer ')) return null;
   const token = authorization.slice('Bearer '.length).trim();
-  const payload = verifyAccessToken(token);
+  const payload = tryVerifyAccessToken(token);
+  if (!payload) return null;
   if (await isTokenRevoked(token)) return null;
   const user = await findUserById(payload.sub);
   if (!user || user.email !== payload.email) return null;
@@ -145,10 +147,8 @@ app.register(async (router) => {
       socket.close();
       return;
     }
-    let payload: { sub: string; email: string };
-    try {
-      payload = verifyAccessToken(token);
-    } catch {
+    let payload: { sub: string; email: string } | null = tryVerifyAccessToken(token);
+    if (!payload) {
       socket.send(JSON.stringify({ error: 'Invalid token' }));
       socket.close();
       return;
